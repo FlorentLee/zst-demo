@@ -101,22 +101,22 @@ export default function AnalyticsScreen() {
         <div className="bg-card border border-border-light rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-5">
             <div className="text-sm font-bold text-text-main flex items-center gap-2">
-              <span className="w-1 h-4 bg-purple-500 rounded-full"></span>
+              <span className="w-1 h-4 bg-success rounded-full"></span>
               企业税务复核健康率
             </div>
-            <span className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded border border-purple-100 font-semibold">低于行业均值 1.2%</span>
+            <span className="text-xs bg-success/10 text-success px-2 py-0.5 rounded border border-success/20 font-semibold">高于行业均值 2.4%</span>
           </div>
 
           <div className="relative h-[160px] flex items-end justify-between px-4 pb-0 mt-4">
             <div className="absolute top-[30%] left-0 right-0 h-px bg-border-light border-dashed"></div>
 
             {[
-              { m: 'Q1', r: 5.4, h: '88%', c: 'bg-primary' },
-              { m: 'Q2', r: 4.9, h: '76%', c: 'bg-info' },
-              { m: 'Q3', r: 5.1, h: '82%', c: 'bg-purple-400' },
-              { m: 'Q4 (预计)', r: 4.8, h: '68%', c: 'bg-success shadow-[0_0_12px_rgba(16,185,129,0.3)] border border-success' }
+              { m: 'Q1', r: 96.4, h: '96%', c: 'bg-primary' },
+              { m: 'Q2', r: 94.9, h: '95%', c: 'bg-info' },
+              { m: 'Q3', r: 95.1, h: '95%', c: 'bg-purple-400' },
+              { m: 'Q4 (预计)', r: 98.8, h: '99%', c: 'bg-success shadow-[0_0_12px_rgba(16,185,129,0.3)] border border-success' }
             ].map((bar, i) => (
-              <div key={i} className="flex flex-col items-center gap-2 w-12 group cursor-pointer relative z-10">
+              <div key={i} className="flex flex-col justify-end items-center gap-2 w-12 h-full group cursor-pointer relative z-10">
                 <div className="text-[10px] font-bold text-text-muted group-hover:text-text-main transition-colors">{bar.r}%</div>
                 <div className={`w-full rounded-t-md opacity-90 transition-all duration-300 group-hover:scale-105 group-hover:opacity-100 ${bar.c}`} style={{ height: bar.h }}></div>
                 <div className="text-xs text-text-muted mt-1 font-medium">{bar.m}</div>
