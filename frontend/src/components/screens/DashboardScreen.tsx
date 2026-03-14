@@ -7,9 +7,10 @@ export interface LedgerItem {
   id: number;
   invoice_number?: string;
   invoice_type?: string;
-  amount: number;
-  created_at: string;
-  compliance_score: number;
+  amount?: number;
+  total_amount?: number;
+  created_at?: string;
+  compliance_score?: number;
 }
 
 export default function DashboardScreen() {
@@ -21,6 +22,7 @@ export default function DashboardScreen() {
     const fetchLedger = async () => {
       try {
         const response = await getLedger();
+        console.log("=== DEBUG: Dashboard Ledger Data ===", response);
         setLedgerItems(response.items || response || []);
       } catch (error) {
         console.error("Failed to fetch ledger:", error);
@@ -185,12 +187,12 @@ export default function DashboardScreen() {
                   <tr key={item.id} className="hover:bg-bg-main/50 transition-colors group">
                     <td className="py-3.5 px-4 text-xs font-mono text-text-main border-b border-border-light/50">{item.invoice_number || `SYS-${item.id}`}</td>
                     <td className="py-3.5 px-4 text-sm text-text-main border-b border-border-light/50">{item.invoice_type || '未知类型'}</td>
-                    <td className="py-3.5 px-4 text-sm text-text-main font-semibold border-b border-border-light/50">¥ {(item.amount || 0).toLocaleString()}</td>
-                    <td className="py-3.5 px-4 text-xs text-text-muted border-b border-border-light/50">{new Date(item.created_at).toLocaleDateString()}</td>
+                    <td className="py-3.5 px-4 text-sm text-text-main font-semibold border-b border-border-light/50">¥ {(item.total_amount ?? item.amount ?? 0).toLocaleString()}</td>
+                    <td className="py-3.5 px-4 text-xs text-text-muted border-b border-border-light/50">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</td>
                     <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
-                      {item.compliance_score >= 90 ? (
+                      {(item.compliance_score ?? 0) >= 90 ? (
                         <span className="text-success font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-success"></span> {item.compliance_score}%</span>
-                      ) : item.compliance_score > 0 ? (
+                      ) : (item.compliance_score ?? 0) > 0 ? (
                         <span className="text-warning font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-warning"></span> {item.compliance_score}%</span>
                       ) : (
                         <span className="text-text-muted text-xs">-</span>

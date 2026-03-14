@@ -103,10 +103,14 @@ async def analyze_invoice(file: UploadFile = File(...), db: Session = Depends(ge
             total_amount = float(num_match.group(0)) if num_match else 0.0
 
         # 3. 自动存入账簿
+        compliance_score = float(item.get("compliance_score", 100.0) if item.get("compliance_score") is not None else 100.0)
+        
         ledger_item = LedgerItem(
             invoice_number=str(item.get("invoice_number", "UNKNOWN")),
             total_amount=total_amount,
-            invoice_type=invoice_type or "UNKNOWN"
+            invoice_type=invoice_type or "UNKNOWN",
+            compliance_score=compliance_score,
+            risk_warning=risk_warning
         )
         db.add(ledger_item)
         db.commit()
@@ -125,7 +129,8 @@ async def analyze_invoice(file: UploadFile = File(...), db: Session = Depends(ge
             invoice_date=item.get("invoice_date", "YYYY-MM-DD"),
             invoice_type=ledger_item.invoice_type,
             risk_warning=risk_warning,
-            workflow_status=workflow_status
+            workflow_status=workflow_status,
+            compliance_score=compliance_score
         ))
 
     return responses

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { analyzeInvoice } from '@/lib/api';
 
 export interface InvoiceAnalyzeResponse {
@@ -17,6 +17,25 @@ export default function InvoiceScreen() {
   const [results, setResults] = useState<InvoiceAnalyzeResponse[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('invoiceResults');
+      if (saved) {
+        setResults(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error('Failed to load invoice results from local storage', e);
+    }
+  }, []);
+
+  // Save to localStorage whenever results change
+  useEffect(() => {
+    if (results.length > 0) {
+      localStorage.setItem('invoiceResults', JSON.stringify(results));
+    }
+  }, [results]);
+
   const handleUpload = async (file: File) => {
     setAnalyzing(true);
     try {
@@ -25,6 +44,7 @@ export default function InvoiceScreen() {
       const parsed = await analyzeInvoice(formData);
 
       // Since backend now returns List[InvoiceAnalyzeResponse], parsed might be an array
+      console.log("=== DEBUG: Upload Response ===", parsed);
       if (Array.isArray(parsed)) {
         setResults(prev => [...parsed, ...prev]);
       } else {

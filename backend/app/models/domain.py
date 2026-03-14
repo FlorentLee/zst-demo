@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, DateTime
+from datetime import datetime
 from app.core.database import Base
 
 class LedgerItem(Base):
@@ -8,3 +9,6 @@ class LedgerItem(Base):
     invoice_number = Column(String, index=True)
     total_amount = Column(Float)
     invoice_type = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    compliance_score = Column(Float, default=100.0)
+    risk_warning = Column(String, nullable=True)
