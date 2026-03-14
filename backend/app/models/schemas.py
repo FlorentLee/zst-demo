@@ -8,7 +8,8 @@ class InvoiceAnalyzeResponse(BaseModel):
     buyer_name: Optional[str] = None
     seller_name: Optional[str] = None
     invoice_number: Optional[str] = None
-    total_amount: Optional[float] = None
+    amount: Optional[float] = None
+    invoice_date: Optional[str] = None
     invoice_type: Optional[str] = None
     risk_warning: Optional[str] = None
     workflow_status: Optional[str] = None

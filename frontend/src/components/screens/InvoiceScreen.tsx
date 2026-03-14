@@ -6,6 +6,7 @@ import { analyzeInvoice } from '@/lib/api';
 export interface InvoiceAnalyzeResponse {
   invoice_type: string;
   invoice_number: string;
+  invoice_date?: string;
   amount: number;
   compliance_score: number;
   risk_warning?: string;
@@ -22,7 +23,14 @@ export default function InvoiceScreen() {
       const formData = new FormData();
       formData.append("file", file);
       const parsed = await analyzeInvoice(formData);
-      setResults(prev => [parsed, ...prev]);
+
+      // Since backend now returns List[InvoiceAnalyzeResponse], parsed might be an array
+      if (Array.isArray(parsed)) {
+        setResults(prev => [...parsed, ...prev]);
+      } else {
+        setResults(prev => [parsed, ...prev]);
+      }
+
       alert("✅ AI解析并入账完毕! 可以在工作台下方和 SQLite中 看到。");
     } catch (e) {
       alert("解析失败，请检查服务日志。");
@@ -110,7 +118,7 @@ export default function InvoiceScreen() {
                   <div className="text-sm font-bold text-text-main truncate group-hover:text-primary transition-colors">{r.invoice_type || '智能识别票据'}</div>
                   <div className={`text-lg font-black shrink-0 ${hasRisk ? 'text-danger' : 'text-text-main'}`}>¥ {r.amount}</div>
                 </div>
-                <div className="text-[11px] text-text-muted mb-3 font-mono">流水/发票号：{r.invoice_number || '解析无编号'}</div>
+                <div className="text-[11px] text-text-muted mb-3 font-mono">流水/发票号：{r.invoice_number || '解析无编号'} · {r.invoice_date || '无日期'}</div>
 
                 {hasRisk ? (
                   <div className="py-2 px-3 bg-danger/5 border border-danger/20 rounded-md text-[11px] text-danger flex gap-1.5 items-start">
