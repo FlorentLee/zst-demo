@@ -7,7 +7,7 @@ from app.models.domain import LedgerItem
 
 router = APIRouter()
 
-@router.get("/", response_model=List[LedgerEntryResponse])
+@router.get("", response_model=List[LedgerEntryResponse])
 def get_ledger_entries(db: Session = Depends(get_db)):
     """
     获取账簿所有明细记录

@@ -11,6 +11,14 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Zhi Shui Tong API", version="1.0.0-beta")
 
+@app.on_event("startup")
+def log_routes():
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    for route in app.routes:
+        logger.info(f"Registered route: {getattr(route, 'methods', None)} {route.path}")
+
 # CORS中间件：允许前端跨域访问
 app.add_middleware(
     CORSMiddleware,
@@ -21,10 +29,10 @@ app.add_middleware(
 )
 
 # 挂载路由模块
-app.include_router(invoice.router, prefix="/api/invoice", tags=["Invoice"])
-app.include_router(ledger.router, prefix="/api/ledger", tags=["Ledger"])
-app.include_router(analytics.router, prefix="/api/analytics", tags=["Analytics"])
-app.include_router(workflow.router, prefix="/api/workflow", tags=["Workflow"])
+app.include_router(invoice.router, prefix="/invoice", tags=["Invoice"])
+app.include_router(ledger.router, prefix="/ledger", tags=["Ledger"])
+app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
+app.include_router(workflow.router, prefix="/workflow", tags=["Workflow"])
 
 @app.on_event("startup")
 def startup_event():
@@ -32,5 +40,5 @@ def startup_event():
     init_rag_knowledge()
 
 @app.get("/")
-def root():
-    return {"status": "ok", "message": "Zhi Shui Tong Backend Beta powered by Doubao is running."}
+def read_root():
+    return {"status": "ZhiShuiTong API is running"}
