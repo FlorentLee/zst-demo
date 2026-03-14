@@ -1,7 +1,11 @@
 FROM python:3.10-slim
 
-# Create a non-root user
+# Create a non-root user and its home directory
 RUN groupadd -r appuser && useradd -r -g appuser -d /home/appuser -s /sbin/nologin -c "Docker image user" appuser
+RUN mkdir -p /home/appuser && chown -R appuser:appuser /home/appuser
+
+# Set the HOME environment variable
+ENV HOME=/home/appuser
 
 # 设置工作目录
 WORKDIR /app
