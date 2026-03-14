@@ -21,12 +21,28 @@ async def analyze_invoice(file: UploadFile = File(...), db: Session = Depends(ge
     # 1. OCR 视觉解析
     raw_response = analyze_invoice_vision(image_url)
     try:
-        match = re.search(r'\{.*\}', raw_response, re.DOTALL)
+        # 增加清洗逻辑：移除 markdown 的 ```json 和 ``` 标记
+        cleaned_response = raw_response.strip()
+        if cleaned_response.startswith("```json"):
+            cleaned_response = cleaned_response[7:]
+        elif cleaned_response.startswith("```"):
+            cleaned_response = cleaned_response[3:]
+        if cleaned_response.endswith("```"):
+            cleaned_response = cleaned_response[:-3]
+        
+        # 进一步使用正则提取最外层的 {}
+        match = re.search(r'\{.*\}', cleaned_response, re.DOTALL)
         if match:
-            raw_response = match.group(0)
-        parsed_data = json.loads(raw_response)
+            cleaned_response = match.group(0)
+            
+        parsed_data = json.loads(cleaned_response)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to parse OCR response as JSON: {raw_response}")
+        print(f"========== AI JSON 解析失败 ==========")
+        print(f"Original AI response:\n{raw_response}")
+        print(f"Cleaned response:\n{cleaned_response if 'cleaned_response' in locals() else 'N/A'}")
+        print(f"Error details: {e}")
+        print(f"=====================================")
+        raise HTTPException(status_code=500, detail=f"Failed to parse OCR response as JSON. See logs for details.")
     
     # 2. RAG合规政策风险查询
     risk_warning = None

@@ -3,7 +3,7 @@ from openai import OpenAI
 from app.core.config import settings
 
 # 强制约束模型名称
-MODEL_NAME = "doubao-seed-2-0-pro-260215"
+MODEL_NAME = "ep-20260314211432-x6kz5"
 
 # 严格使用 OpenAI SDK 初始化火山方舟接口
 client = OpenAI(
