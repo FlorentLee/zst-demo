@@ -29,7 +29,7 @@ export default function InvoiceUploader({ onAnalysisComplete }: InvoiceUploaderP
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const max = 1200;
+                    const max = 800; // Force max to 800x800
 
                     if (width > height) {
                         if (width > max) {
@@ -57,7 +57,7 @@ export default function InvoiceUploader({ onAnalysisComplete }: InvoiceUploaderP
                         } else {
                             resolve(file);
                         }
-                    }, 'image/jpeg', 0.7);
+                    }, 'image/jpeg', 0.6); // Lower quality slightly to stay under 150KB
                 };
                 img.src = event.target?.result as string;
             };

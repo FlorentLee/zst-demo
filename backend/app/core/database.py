@@ -24,8 +24,11 @@ def get_db():
         db.close()
 
 # --- ChromaDB Setup ---
-os.makedirs(settings.CHROMA_DB_DIR, exist_ok=True)
-chroma_client = chromadb.PersistentClient(path=settings.CHROMA_DB_DIR)
+_chroma_client = None
 
 def get_chroma_client():
-    return chroma_client
+    global _chroma_client
+    if _chroma_client is None:
+        os.makedirs(settings.CHROMA_DB_DIR, exist_ok=True)
+        _chroma_client = chromadb.PersistentClient(path=settings.CHROMA_DB_DIR)
+    return _chroma_client

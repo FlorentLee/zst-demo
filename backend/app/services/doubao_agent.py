@@ -9,6 +9,7 @@ MODEL_NAME = "ep-20260314211432-x6kz5"
 client = OpenAI(
     base_url="https://ark.cn-beijing.volces.com/api/v3",
     api_key=settings.ARK_API_KEY,
+    timeout=120.0,
 )
 
 def analyze_invoice_vision(image_url: str, prompt: str = "你是一个资深审计专家。请分步骤操作：1. 识别发票中所有文字；2. 提取金额、税号等关键字段；3. 结合 RAG 检索到的政策进行风险判定。最终仅输出严格的 JSON。字段必须为：购买方名称(buyer_name)、销售方名称(seller_name)、发票号码(invoice_number)、总金额(total_amount，必须是纯数字浮点数，不要带元)、发票类型(invoice_type)。") -> str:

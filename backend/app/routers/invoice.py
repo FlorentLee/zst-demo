@@ -18,8 +18,16 @@ async def analyze_invoice(file: UploadFile = File(...), db: Session = Depends(ge
     base64_img = base64.b64encode(content).decode("utf-8")
     image_url = f"data:{file.content_type};base64,{base64_img}"
 
+    # 手动释放大对象内存
+    del content
+    del base64_img
+
     # 1. OCR 视觉解析
     raw_response = analyze_invoice_vision(image_url)
+    
+    # 解析完毕释放 URL
+    del image_url
+    
     try:
         # 增加清洗逻辑：移除 markdown 的 ```json 和 ``` 标记
         cleaned_response = raw_response.strip()
