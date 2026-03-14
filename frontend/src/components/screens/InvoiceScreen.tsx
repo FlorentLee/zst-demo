@@ -37,20 +37,20 @@ export default function InvoiceScreen() {
 
   return (
     <div className="p-6 max-w-[1200px] mx-auto">
-      <input 
-        type="file" 
-        className="hidden" 
-        ref={fileInputRef} 
+      <input
+        type="file"
+        className="hidden"
+        ref={fileInputRef}
         onChange={(e) => {
           if (e.target.files && e.target.files[0]) {
             handleUpload(e.target.files[0]);
           }
-        }} 
+        }}
       />
-      
+
       {/* Upload Zone */}
       <div className="bg-white border border-border-light shadow-sm rounded-xl p-6 mb-6">
-        <div 
+        <div
           onClick={onZoneClick}
           className="border-2 border-dashed border-border-light bg-bg-main rounded-lg p-10 text-center cursor-pointer transition-all duration-200 hover:border-primary hover:bg-primary/5"
         >
@@ -75,10 +75,10 @@ export default function InvoiceScreen() {
         <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6 flex flex-col gap-3 shadow-sm">
           <div className="flex items-center gap-2">
             <span className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></span>
-            <span className="text-primary font-bold text-sm">深思考引擎运行中：火山视觉多模态校验与 RAG 政策合规审计...</span>
+            <span className="text-primary font-bold text-sm">Gemini多模态视觉校验与RAG合规审计中...</span>
           </div>
           <div className="h-1.5 bg-bg-main rounded-full overflow-hidden w-full relative">
-             <div className="absolute top-0 bottom-0 left-0 w-2/3 bg-primary rounded-full animate-pulse shadow-[0_0_8px_rgba(37,99,235,0.6)]"></div>
+            <div className="absolute top-0 bottom-0 left-0 w-2/3 bg-primary rounded-full animate-pulse shadow-[0_0_8px_rgba(37,99,235,0.6)]"></div>
           </div>
         </div>
       )}
@@ -111,15 +111,15 @@ export default function InvoiceScreen() {
                   <div className={`text-lg font-black shrink-0 ${hasRisk ? 'text-danger' : 'text-text-main'}`}>¥ {r.amount}</div>
                 </div>
                 <div className="text-[11px] text-text-muted mb-3 font-mono">流水/发票号：{r.invoice_number || '解析无编号'}</div>
-                
+
                 {hasRisk ? (
                   <div className="py-2 px-3 bg-danger/5 border border-danger/20 rounded-md text-[11px] text-danger flex gap-1.5 items-start">
-                     <span className="shrink-0 mt-0.5">⚠️</span> 
-                     <span className="leading-snug">{r.risk_warning}</span>
+                    <span className="shrink-0 mt-0.5">⚠️</span>
+                    <span className="leading-snug">{r.risk_warning}</span>
                   </div>
                 ) : (
                   <div className="py-2 px-3 bg-success/5 border border-success/20 rounded-md text-[11px] text-success flex gap-1.5 items-center font-medium">
-                     <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-success"></span> AI 校验合规 · 置信度 {r.compliance_score}%
+                    <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-success"></span> AI 校验合规 · 置信度 {r.compliance_score}%
                   </div>
                 )}
               </div>
@@ -139,7 +139,7 @@ export default function InvoiceScreen() {
             </div>
             <div className="text-[11px] text-text-muted mb-3 font-mono">发票号：0123456789 · 2024-12-18</div>
             <div className="py-2 px-3 bg-success/5 border border-success/20 rounded-md text-[11px] text-success flex gap-1.5 items-center font-medium">
-               <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-success"></span> AI 校验准确率 99.8% · 已验真 · 无重复
+              <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-success"></span> AI 校验准确率 99.8% · 已验真 · 无重复
             </div>
           </div>
         </div>
@@ -155,7 +155,7 @@ export default function InvoiceScreen() {
             </div>
             <div className="text-[11px] text-text-muted mb-3 font-mono">报销单号：EXP-2024-2018 · 2024-12-17</div>
             <div className="py-2 px-3 bg-warning/10 border border-warning/20 rounded-md text-[11px] text-warning flex gap-1.5 items-center font-medium">
-               <span className="shrink-0 mt-0.5">⚠️</span> AI预警：餐饮费疑似超标，建议人工复核
+              <span className="shrink-0 mt-0.5">⚠️</span> AI预警：餐饮费疑似超标，建议人工复核
             </div>
           </div>
         </div>
@@ -171,7 +171,7 @@ export default function InvoiceScreen() {
             </div>
             <div className="text-[11px] text-text-muted mb-3 font-mono">发票号：9876543210 · 2024-12-16</div>
             <div className="py-2 px-3 bg-success/5 border border-success/20 rounded-md text-[11px] text-success flex gap-1.5 items-center font-medium">
-               <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-success"></span> AI 校验准确率 100% · 已验真 · 无重复
+              <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-success"></span> AI 校验准确率 100% · 已验真 · 无重复
             </div>
           </div>
         </div>
@@ -187,7 +187,7 @@ export default function InvoiceScreen() {
             </div>
             <div className="text-[11px] text-text-muted mb-3 font-mono">发票号：1122334455 · 2024-12-15</div>
             <div className="py-2 px-3 bg-danger/5 border border-danger/20 rounded-md text-[11px] text-danger flex gap-1.5 items-center font-medium">
-               <span className="shrink-0 mt-0.5">⚠️</span> 风险拦截：与账簿数据不符，差异 ¥12,400
+              <span className="shrink-0 mt-0.5">⚠️</span> 风险拦截：与账簿数据不符，差异 ¥12,400
             </div>
           </div>
         </div>

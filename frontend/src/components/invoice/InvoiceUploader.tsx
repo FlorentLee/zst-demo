@@ -97,7 +97,7 @@ export default function InvoiceUploader({ onAnalysisComplete }: InvoiceUploaderP
         setLoadingText("正在加密上传安全链路...");
 
         const textTimers = [
-            setTimeout(() => setLoadingText("豆包大模型正在进行多模态审计..."), 3000),
+            setTimeout(() => setLoadingText("Gemini大模型正在进行多模态审计..."), 3000),
             setTimeout(() => setLoadingText("正在匹配 2026 最新财税政策库..."), 8000),
         ];
 

@@ -24,6 +24,6 @@ export const getLedger = async () => {
 
 // 获取老板经营报告 API
 export const getCEOReport = async () => {
-  const { data } = await apiClient.get('/analytics/ceo-report');
+  const { data } = await apiClient.get('/analytics/mock-ceo-report');
   return data;
 };
