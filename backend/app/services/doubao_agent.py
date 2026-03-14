@@ -11,7 +11,7 @@ client = OpenAI(
     api_key=settings.ARK_API_KEY,
 )
 
-def analyze_invoice_vision(image_url: str, prompt: str = "请提取发票中的关键信息：购买方名称(buyer_name)、销售方名称(seller_name)、发票号码(invoice_number)、总金额(total_amount)、发票类型(invoice_type，如餐饮费、交通费等)。必须以严格的JSON格式返回，所有键名使用上述括号内的英文，并且total_amount总金额必须是纯数字浮点数（不要带'元'等符号）。") -> str:
+def analyze_invoice_vision(image_url: str, prompt: str = "你是一个资深审计专家。请分步骤操作：1. 识别发票中所有文字；2. 提取金额、税号等关键字段；3. 结合 RAG 检索到的政策进行风险判定。最终仅输出严格的 JSON。字段必须为：购买方名称(buyer_name)、销售方名称(seller_name)、发票号码(invoice_number)、总金额(total_amount，必须是纯数字浮点数，不要带元)、发票类型(invoice_type)。") -> str:
     """
     使用豆包多模态模型进行发票 OCR 解析
     """

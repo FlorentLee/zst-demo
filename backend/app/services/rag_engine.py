@@ -1,7 +1,12 @@
 import os
+import time
 from app.core.database import get_chroma_client
 
 collection = get_chroma_client().get_or_create_collection(name="tax_policies")
+
+# 简单缓存机制：记录查询结果及时间戳
+_policy_cache = {}
+CACHE_TTL = 300  # 5分钟缓存过期
 
 def init_rag_knowledge():
     """
@@ -37,8 +42,14 @@ def init_rag_knowledge():
 
 def search_policy(query: str, top_k: int = 2) -> list[str]:
     """
-    检索相关的财税政策
+    检索相关的财税政策（带 5 分钟缓存）
     """
+    current_time = time.time()
+    if query in _policy_cache:
+        cached_result, timestamp = _policy_cache[query]
+        if current_time - timestamp < CACHE_TTL:
+            return cached_result
+            
     if collection.count() == 0:
         return []
         
@@ -48,4 +59,7 @@ def search_policy(query: str, top_k: int = 2) -> list[str]:
     )
     if not results['documents']:
         return []
-    return results['documents'][0]
+        
+    final_result = results['documents'][0]
+    _policy_cache[query] = (final_result, current_time)
+    return final_result

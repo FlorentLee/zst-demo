@@ -17,7 +17,53 @@ interface InvoiceUploaderProps {
 export default function InvoiceUploader({ onAnalysisComplete }: InvoiceUploaderProps) {
     const [file, setFile] = useState<FileWithPreview | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [loadingText, setLoadingText] = useState("深度审计中...");
     const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+    const compressImage = (file: File): Promise<File> => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new window.Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const max = 1200;
+
+                    if (width > height) {
+                        if (width > max) {
+                            height = Math.round((height * max) / width);
+                            width = max;
+                        }
+                    } else {
+                        if (height > max) {
+                            width = Math.round((width * max) / height);
+                            height = max;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx?.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob((blob) => {
+                        if (blob) {
+                            const newFile = new File([blob], file.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now(),
+                            });
+                            resolve(newFile);
+                        } else {
+                            resolve(file);
+                        }
+                    }, 'image/jpeg', 0.7);
+                };
+                img.src = event.target?.result as string;
+            };
+            reader.readAsDataURL(file);
+        });
+    };
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const acceptedFile = acceptedFiles[0];
@@ -48,13 +94,20 @@ export default function InvoiceUploader({ onAnalysisComplete }: InvoiceUploaderP
 
         setIsUploading(true);
         setAnalysisResult(null);
+        setLoadingText("正在加密上传安全链路...");
+
+        const textTimers = [
+            setTimeout(() => setLoadingText("豆包大模型正在进行多模态审计..."), 3000),
+            setTimeout(() => setLoadingText("正在匹配 2026 最新财税政策库..."), 8000),
+        ];
 
         try {
+            const compressedFile = await compressImage(file);
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', compressedFile);
 
             const data = await analyzeInvoice(formData);
-            
+
             // 适配后端实际返回结构：避免前端报错
             const displayData = {
                 compliance_score: data.risk_warning ? 45 : 98,
@@ -79,6 +132,7 @@ export default function InvoiceUploader({ onAnalysisComplete }: InvoiceUploaderP
         } catch (error) {
             console.error('分析过程中出错:', error);
         } finally {
+            textTimers.forEach(clearTimeout);
             setIsUploading(false);
         }
     };
@@ -134,7 +188,7 @@ export default function InvoiceUploader({ onAnalysisComplete }: InvoiceUploaderP
                                 {isUploading ? (
                                     <>
                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>深度审计中...</span>
+                                        <span>{loadingText}</span>
                                     </>
                                 ) : (
                                     <>

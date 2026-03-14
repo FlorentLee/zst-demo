@@ -14,30 +14,30 @@ export default function WorkflowScreen() {
           </div>
           <div className="text-xs text-text-muted mt-1">拖拽以自定义审批流</div>
         </div>
-        
+
         <div className="p-4 flex-1 overflow-y-auto flex flex-col gap-3">
           {/* Node Items */}
-          <div className="bg-slate-800 text-slate-100 p-3 rounded-lg border-2 border-transparent hover:border-slate-500 cursor-grab flex items-center gap-3 shadow-sm transition-all">
+          <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-slate-400 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
             <div className="text-xl">🟢</div>
             <div className="text-sm font-medium">触发器 (Trigger)</div>
           </div>
-          <div className="bg-slate-800 text-slate-100 p-3 rounded-lg border-2 border-transparent hover:border-blue-500 cursor-grab flex items-center gap-3 shadow-sm transition-all">
+          <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-blue-500 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
             <div className="text-xl">🤖</div>
             <div className="text-sm font-medium">AI 自动审核</div>
           </div>
-          <div className="bg-slate-800 text-slate-100 p-3 rounded-lg border-2 border-transparent hover:border-emerald-500 cursor-grab flex items-center gap-3 shadow-sm transition-all">
+          <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-emerald-500 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
             <div className="text-xl">👤</div>
             <div className="text-sm font-medium">人工审批节点</div>
           </div>
-          <div className="bg-slate-800 text-slate-100 p-3 rounded-lg border-2 border-transparent hover:border-amber-500 cursor-grab flex items-center gap-3 shadow-sm transition-all">
+          <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-amber-500 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
             <div className="text-xl">📊</div>
             <div className="text-sm font-medium">条件分支网关</div>
           </div>
-          <div className="bg-slate-800 text-slate-100 p-3 rounded-lg border-2 border-transparent hover:border-purple-500 cursor-grab flex items-center gap-3 shadow-sm transition-all">
+          <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-purple-500 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
             <div className="text-xl">📧</div>
             <div className="text-sm font-medium">发送通知节点</div>
           </div>
-          <div className="bg-slate-800 text-slate-100 p-3 rounded-lg border-2 border-transparent hover:border-teal-500 cursor-grab flex items-center gap-3 shadow-sm transition-all">
+          <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-teal-500 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
             <div className="text-xl">📒</div>
             <div className="text-sm font-medium">自动入账执行</div>
           </div>
@@ -46,7 +46,7 @@ export default function WorkflowScreen() {
 
       {/* Right Flow Canvas */}
       <div className="flex-1 bg-card border border-border-light rounded-xl shadow-sm flex flex-col relative overflow-hidden bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] bg-white">
-        
+
         {/* Canvas Header */}
         <div className="absolute top-0 left-0 right-0 p-5 flex items-center justify-between pointer-events-none z-10">
           <div>
@@ -69,7 +69,7 @@ export default function WorkflowScreen() {
 
         {/* Canvas Body (Nodes Flow) */}
         <div className="flex-1 flex flex-col items-center justify-center pt-24 px-10 pb-20 relative overflow-auto pointer-events-auto">
-          
+
           <div className="flex items-center w-full max-w-[900px] justify-between relative mt-8">
             {/* Connection Line Background */}
             <div className="absolute top-1/2 left-[10%] right-[10%] h-[2px] bg-border-dark -translate-y-1/2 z-0"></div>
@@ -144,42 +144,42 @@ export default function WorkflowScreen() {
 
           {/* AI Node Config Panel */}
           <div className="mt-16 bg-blue-50/80 border border-primary/20 rounded-xl p-5 w-full max-w-[800px] shadow-sm relative overflow-hidden backdrop-blur-sm pointer-events-auto">
-             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10"></div>
-             
-             <div className="flex items-center gap-2 mb-4">
-               <span className="text-xl">⚙️</span>
-               <h3 className="text-sm font-bold text-primary">AI 节点智能配置 (Agent 审查集)</h3>
-             </div>
-             
-             <div className="grid grid-cols-2 gap-4">
-               <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-primary/10 shadow-sm transition-colors hover:border-primary/30">
-                 <div className="w-6 h-6 rounded-full bg-success/20 text-success flex items-center justify-center text-sm">✓</div>
-                 <div className="text-sm font-bold text-text-main">发票真伪验证与查重</div>
-               </div>
-               <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-primary/10 shadow-sm transition-colors hover:border-primary/30">
-                 <div className="w-6 h-6 rounded-full bg-success/20 text-success flex items-center justify-center text-sm">✓</div>
-                 <div className="text-sm font-bold text-text-main">费用类型及税率合规检查</div>
-               </div>
-               <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-primary/10 shadow-sm transition-colors hover:border-primary/30">
-                 <div className="w-6 h-6 rounded-full bg-success/20 text-success flex items-center justify-center text-sm">✓</div>
-                 <div className="text-sm font-bold text-text-main">异常金额智能标记 (RAG)</div>
-               </div>
-               <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-primary/10 shadow-sm transition-colors hover:border-primary/30">
-                 <div className="w-6 h-6 rounded-full bg-success/20 text-success flex items-center justify-center text-sm">✓</div>
-                 <div className="text-sm font-bold text-text-main">收款账户主体一致性比对</div>
-               </div>
-             </div>
-             
-             <div className="mt-4 pt-4 border-t border-primary/10 flex justify-between items-center text-xs">
-               <span className="text-text-muted">当票据解析金额大于设定阈值时，触发后置人工审批。</span>
-               <button className="text-primary font-bold hover:underline">高级配置 →</button>
-             </div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10"></div>
+
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-xl">⚙️</span>
+              <h3 className="text-sm font-bold text-primary">AI 节点智能配置 (Agent 审查集)</h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-primary/10 shadow-sm transition-colors hover:border-primary/30">
+                <div className="w-6 h-6 rounded-full bg-success/20 text-success flex items-center justify-center text-sm">✓</div>
+                <div className="text-sm font-bold text-text-main">发票真伪验证与查重</div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-primary/10 shadow-sm transition-colors hover:border-primary/30">
+                <div className="w-6 h-6 rounded-full bg-success/20 text-success flex items-center justify-center text-sm">✓</div>
+                <div className="text-sm font-bold text-text-main">费用类型及税率合规检查</div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-primary/10 shadow-sm transition-colors hover:border-primary/30">
+                <div className="w-6 h-6 rounded-full bg-success/20 text-success flex items-center justify-center text-sm">✓</div>
+                <div className="text-sm font-bold text-text-main">异常金额智能标记 (RAG)</div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-primary/10 shadow-sm transition-colors hover:border-primary/30">
+                <div className="w-6 h-6 rounded-full bg-success/20 text-success flex items-center justify-center text-sm">✓</div>
+                <div className="text-sm font-bold text-text-main">收款账户主体一致性比对</div>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-primary/10 flex justify-between items-center text-xs">
+              <span className="text-text-muted">当票据解析金额大于设定阈值时，触发后置人工审批。</span>
+              <button className="text-primary font-bold hover:underline">高级配置 →</button>
+            </div>
           </div>
 
         </div>
 
-        {/* Bottom Stats Widget */}
-        <div className="absolute bottom-6 right-6 bg-white border border-border-light rounded-xl shadow-lg p-5 w-[360px] pointer-events-auto">
+        {/* Bottom Stats Widget (Moved inline to avoid absolute positioning overlap) */}
+        <div className="mt-8 mb-4 w-full max-w-[800px] bg-white border border-border-light rounded-xl shadow-sm p-5 pointer-events-auto">
           <div className="text-sm font-bold text-text-main mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-1 h-4 bg-primary rounded-full"></span>
@@ -187,7 +187,7 @@ export default function WorkflowScreen() {
             </div>
             <span className="text-xs text-text-muted">实时更新</span>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <div className="bg-bg-main p-3 rounded-lg border border-border-light">
               <div className="text-xs text-text-muted mb-1 font-semibold">已完成</div>
               <div className="text-2xl font-black text-text-main">284</div>
