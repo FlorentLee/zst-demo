@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.domain import LedgerItem
 from app.models.schemas import CEOReportResponse
-from app.services.doubao_agent import generate_ceo_report
+from app.services.gemini_agent import generate_ceo_report
 
 router = APIRouter()
 

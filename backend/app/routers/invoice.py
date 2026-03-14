@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.schemas import InvoiceAnalyzeResponse
-from app.services.doubao_agent import analyze_invoice_vision
+from app.services.gemini_agent import analyze_invoice_vision
 from app.services.rag_engine import search_policy
 from app.models.domain import LedgerItem
 

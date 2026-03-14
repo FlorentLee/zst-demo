@@ -1,5 +1,8 @@
 FROM python:3.10-slim
 
+# Create a non-root user
+RUN groupadd -r appuser && useradd -r -g appuser -d /home/appuser -s /sbin/nologin -c "Docker image user" appuser
+
 # 设置工作目录
 WORKDIR /app
 
@@ -9,6 +12,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 将所有后端代码复制到容器内的工作目录
 COPY . .
+
+# Change the owner of the directory
+RUN chown -R appuser:appuser /app
+
+# Switch to the non-root user
+USER appuser
 
 # 暴露 FastAPI 默认使用的端口 8000
 EXPOSE 8000

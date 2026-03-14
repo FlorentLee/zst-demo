@@ -8,3 +8,5 @@ chromadb
 sqlalchemy
 python-multipart
 pydantic-settings
+google-generativeai
+
