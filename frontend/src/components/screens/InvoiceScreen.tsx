@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { analyzeInvoice } from '@/lib/api';
+import { analyzeInvoice, deleteLedgerItem, updateLedgerItem } from '@/lib/api';
+import { useLedgerStore } from '@/store/ledgerStore';
 
 export interface InvoiceAnalyzeResponse {
   id?: string;
@@ -52,36 +53,34 @@ const initialMocks: InvoiceAnalyzeResponse[] = [
 
 export default function InvoiceScreen() {
   const [analyzing, setAnalyzing] = useState(false);
-  const [results, setResults] = useState<InvoiceAnalyzeResponse[]>([]);
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { ledgerItems, fetchLedger } = useLedgerStore();
+  const [results, setResults] = useState<InvoiceAnalyzeResponse[]>([]);
 
   // Edit Modal State
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<InvoiceAnalyzeResponse | null>(null);
 
-  // Load from localStorage on mount
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('invoiceResults');
-      if (saved) {
-        setResults(JSON.parse(saved));
-      } else {
-        setResults(initialMocks);
-      }
-    } catch (e) {
-      console.error('Failed to load invoice results from local storage', e);
+    const items = ledgerItems;
+    if (items.length > 0) {
+      const mapped = items.map((item: any) => ({
+        id: item.id.toString(),
+        invoice_type: item.invoice_type || '未知类型',
+        invoice_number: item.invoice_number || '未知',
+        invoice_date: item.created_at ? new Date(item.created_at).toISOString().split('T')[0] : '未知',
+        amount: item.total_amount ?? item.amount ?? 0,
+        compliance_score: item.compliance_score ?? 0,
+        risk_warning: item.risk_warning,
+      }));
+      setResults(mapped);
+    } else {
       setResults(initialMocks);
     }
-  }, []);
-
-  // Save to localStorage whenever results change
-  useEffect(() => {
-    if (results.length > 0) {
-      localStorage.setItem('invoiceResults', JSON.stringify(results));
-    }
-  }, [results]);
+  }, [ledgerItems]);
 
   const handleUpload = async (file: File) => {
     setAnalyzing(true);
@@ -98,22 +97,12 @@ export default function InvoiceScreen() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const parsed = await analyzeInvoice(formData);
+      await analyzeInvoice(formData);
 
-      const prepareData = (data: any) => ({
-        ...data,
-        id: `inv-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      });
-
-      if (Array.isArray(parsed)) {
-        const parsedWithId = parsed.map(prepareData);
-        setResults(prev => [...parsedWithId, ...prev]);
-      } else {
-        setResults(prev => [prepareData(parsed), ...prev]);
-      }
+      await fetchLedger();
 
       setProgress(100);
-      setStatusMessage({ type: 'success', text: 'AI解析并入账完毕! 已录入工作台下方的最近处理记录。' });
+      setStatusMessage({ type: 'success', text: 'AI解析并入账完毕! 已同步至最新列表。' });
     } catch (e) {
       setStatusMessage({ type: 'error', text: '解析失败，请检查服务日志。' });
     } finally {
@@ -136,20 +125,53 @@ export default function InvoiceScreen() {
     setEditForm(null);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editingIndex !== null && editForm) {
-      const newResults = [...results];
-      newResults[editingIndex] = editForm;
-      setResults(newResults);
+      const targetId = editForm.id;
+      if (targetId && targetId.startsWith('mock-')) {
+        // Mock data: just update local state
+        const newResults = [...results];
+        newResults[editingIndex] = editForm;
+        setResults(newResults);
+      } else if (targetId) {
+        // Real data: call API
+        try {
+          await updateLedgerItem(Number(targetId), {
+            invoice_number: editForm.invoice_number,
+            invoice_type: editForm.invoice_type,
+            total_amount: editForm.amount,
+            compliance_score: editForm.compliance_score,
+            risk_warning: editForm.risk_warning,
+          });
+          await fetchLedger();
+        } catch (error) {
+          console.error('Failed to update ledger item', error);
+          alert('更新失败，请稍后重试');
+        }
+      }
       closeEditModal();
     }
   };
 
-  const handleDelete = (idx: number) => {
+  const handleDelete = async (idx: number) => {
     if (confirm('确认删除该记录吗？')) {
-      const newResults = [...results];
-      newResults.splice(idx, 1);
-      setResults(newResults);
+      const item = results[idx];
+      const targetId = item.id;
+      if (targetId && targetId.startsWith('mock-')) {
+        // Mock data: just remove from local state
+        const newResults = [...results];
+        newResults.splice(idx, 1);
+        setResults(newResults);
+      } else if (targetId) {
+        // Real data: call API
+        try {
+          await deleteLedgerItem(Number(targetId));
+          await fetchLedger();
+        } catch (error) {
+          console.error('Failed to delete ledger item', error);
+          alert('删除失败，请稍后重试');
+        }
+      }
     }
   };
 

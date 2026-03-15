@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { getLedger, deleteLedgerItem, updateLedgerItem } from '@/lib/api';
+import { useLedgerStore } from '@/store/ledgerStore';
+import { deleteLedgerItem, updateLedgerItem } from '@/lib/api';
 
 export interface LedgerItem {
   id: number;
@@ -14,32 +15,59 @@ export interface LedgerItem {
 }
 
 export default function DashboardScreen() {
-  const [ledgerItems, setLedgerItems] = useState<LedgerItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { ledgerItems, fetchLedger } = useLedgerStore();
 
   // Modal and Edit states
   const [isViewAllOpen, setIsViewAllOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<LedgerItem | null>(null);
   const [editForm, setEditForm] = useState<Partial<LedgerItem>>({});
 
-  // Poll ledger data from backend
-  const fetchLedger = async () => {
-    try {
-      const response = await getLedger();
-      console.log("=== DEBUG: Dashboard Ledger Data ===", response);
-      setLedgerItems(response.items || response || []);
-    } catch (error) {
-      console.error("Failed to fetch ledger:", error);
-    } finally {
-      setLoading(false);
+  const mockLedgerItems: LedgerItem[] = [
+    {
+      id: 9901,
+      invoice_number: '0123456789',
+      invoice_type: '增值税专用发票',
+      total_amount: 84600.00,
+      created_at: '2024-12-18',
+      compliance_score: 99,
+    },
+    {
+      id: 9902,
+      invoice_number: 'EXP-2024-2018',
+      invoice_type: '差旅费用报销单',
+      total_amount: 3280.00,
+      created_at: '2024-12-17',
+      compliance_score: 85,
+    },
+    {
+      id: 9903,
+      invoice_number: '9876543210',
+      invoice_type: '增值税普通发票',
+      total_amount: 128000.00,
+      created_at: '2024-12-16',
+      compliance_score: 100,
+    },
+    {
+      id: 9904,
+      invoice_number: '1122334455',
+      invoice_type: '增值税专用发票',
+      total_amount: 42800.00,
+      created_at: '2024-12-15',
+      compliance_score: 75,
     }
-  };
+  ];
 
+  // Poll ledger data from backend
   useEffect(() => {
-    fetchLedger();
-    const interval = setInterval(fetchLedger, 5000);
+    const initialFetch = async () => {
+      await fetchLedger();
+      setLoading(false);
+    };
+    initialFetch();
+    const interval = setInterval(fetchLedger, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchLedger]);
 
   const handleDelete = async (id: number) => {
     try {
@@ -74,7 +102,8 @@ export default function DashboardScreen() {
   };
 
   // Only show first 5 items on the dashboard
-  const displayItems = isViewAllOpen ? ledgerItems : ledgerItems.slice(0, 5);
+  const effectiveLedgerItems = ledgerItems.length > 0 ? ledgerItems : mockLedgerItems;
+  const displayItems = isViewAllOpen ? effectiveLedgerItems : effectiveLedgerItems.slice(0, 5);
 
   return (
     <div className="p-4 md:p-6 relative">
@@ -279,38 +308,6 @@ export default function DashboardScreen() {
                     </td>
                   </tr>
                 ))
-              )}
-
-              {/* Fallback mock items to match UI if too few dynamic items are present */}
-              {ledgerItems.length < 3 && !isViewAllOpen && (
-                <>
-                  <tr className="hover:bg-bg-main/50 transition-colors">
-                    <td className="py-3.5 px-4 text-xs font-mono text-text-main border-b border-border-light/50">EXP-2024-2018</td>
-                    <td className="py-3.5 px-4 text-sm text-text-main border-b border-border-light/50">差旅费用</td>
-                    <td className="py-3.5 px-4 text-sm text-text-main font-semibold border-b border-border-light/50">¥ 3,280</td>
-                    <td className="py-3.5 px-4 text-xs text-text-muted border-b border-border-light/50">2024-12-17</td>
-                    <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
-                      <span className="text-warning font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-warning"></span> 75分</span>
-                    </td>
-                    <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
-                      <span className="inline-block py-1 px-2.5 rounded text-xs font-semibold bg-warning/10 text-warning border border-warning/20">AI预警</span>
-                    </td>
-                    <td className="py-3.5 px-4 text-sm border-b border-border-light/50">-</td>
-                  </tr>
-                  <tr className="hover:bg-bg-main/50 transition-colors">
-                    <td className="py-3.5 px-4 text-xs font-mono text-text-main border-b border-border-light/50">INV-2024-4819</td>
-                    <td className="py-3.5 px-4 text-sm text-text-main border-b border-border-light/50">增值税专用发票</td>
-                    <td className="py-3.5 px-4 text-sm text-text-main font-semibold border-b border-border-light/50">¥ 42,800</td>
-                    <td className="py-3.5 px-4 text-xs text-text-muted border-b border-border-light/50">2024-12-15</td>
-                    <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
-                      <span className="text-danger font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-danger"></span> 20分</span>
-                    </td>
-                    <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
-                      <span className="inline-block py-1 px-2.5 rounded text-xs font-semibold bg-danger/10 text-danger border border-danger/20">人工核验</span>
-                    </td>
-                    <td className="py-3.5 px-4 text-sm border-b border-border-light/50">-</td>
-                  </tr>
-                </>
               )}
             </tbody>
           </table>
