@@ -276,7 +276,7 @@ export default function WorkflowScreen() {
         {/* Right Flow Canvas */}
         <div className="flex-1 bg-card border border-border-light rounded-xl shadow-sm flex flex-col relative overflow-hidden bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] bg-white">
           {/* Canvas Header */}
-          <div className="absolute top-0 left-0 right-0 p-5 flex items-center justify-between pointer-events-none z-10">
+          <div className="p-5 flex items-center justify-between z-10 bg-white/80 backdrop-blur-sm border-b border-border-light shrink-0">
             <div>
               <h2 className="text-xl font-black text-text-main flex items-center gap-2">
                 {currentTemplate.title}
@@ -285,18 +285,18 @@ export default function WorkflowScreen() {
                   {currentTemplate.status}
                 </span>
               </h2>
-              <div className="text-xs font-semibold text-text-muted mt-1 pointer-events-auto cursor-pointer hover:underline">
+              <div className="text-xs font-semibold text-text-muted mt-1 cursor-pointer hover:underline">
                 适用于：全公司所有部门 · ID: {currentTemplate.id}
               </div>
             </div>
-            <div className="flex gap-2 pointer-events-auto">
+            <div className="flex gap-2">
               <button className="btn btn-ghost !py-1.5 bg-white border border-border-light shadow-sm text-text-main hover:text-primary">历史版本</button>
               <button onClick={saveChanges} className="btn btn-primary !py-1.5 shadow-sm">发布改动</button>
             </div>
           </div>
 
           {/* Canvas Body (Nodes Flow) */}
-          <div className="flex-1 overflow-y-auto flex flex-col items-center pt-32 px-10 pb-10 pointer-events-auto relative">
+          <div className="flex-1 overflow-y-auto flex flex-col items-center pt-8 px-10 pb-10 relative">
             <div className="flex items-center w-full max-w-5xl justify-center relative mt-8 flex-wrap gap-y-16">
               {/* Connection Line Background */}
               <div className="absolute top-7 left-[5%] right-[5%] h-[2px] bg-border-dark -translate-y-1/2 z-0 hidden lg:block"></div>
