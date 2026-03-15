@@ -23,41 +23,6 @@ export default function DashboardScreen() {
   const [editingItem, setEditingItem] = useState<LedgerItem | null>(null);
   const [editForm, setEditForm] = useState<Partial<LedgerItem>>({});
 
-  const mockLedgerItems: LedgerItem[] = [
-    {
-      id: 9901,
-      invoice_number: '0123456789',
-      invoice_type: '增值税专用发票',
-      total_amount: 84600.00,
-      created_at: '2024-12-18',
-      compliance_score: 99,
-    },
-    {
-      id: 9902,
-      invoice_number: 'EXP-2024-2018',
-      invoice_type: '差旅费用报销单',
-      total_amount: 3280.00,
-      created_at: '2024-12-17',
-      compliance_score: 85,
-    },
-    {
-      id: 9903,
-      invoice_number: '9876543210',
-      invoice_type: '增值税普通发票',
-      total_amount: 128000.00,
-      created_at: '2024-12-16',
-      compliance_score: 100,
-    },
-    {
-      id: 9904,
-      invoice_number: '1122334455',
-      invoice_type: '增值税专用发票',
-      total_amount: 42800.00,
-      created_at: '2024-12-15',
-      compliance_score: 75,
-    }
-  ];
-
   // Poll ledger data from backend
   useEffect(() => {
     const initialFetch = async () => {
@@ -102,8 +67,7 @@ export default function DashboardScreen() {
   };
 
   // Only show first 5 items on the dashboard
-  const effectiveLedgerItems = ledgerItems.length > 0 ? ledgerItems : mockLedgerItems;
-  const displayItems = isViewAllOpen ? effectiveLedgerItems : effectiveLedgerItems.slice(0, 5);
+  const displayItems = isViewAllOpen ? ledgerItems : ledgerItems.slice(0, 5);
 
   return (
     <div className="p-4 md:p-6 relative">

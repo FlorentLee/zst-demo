@@ -296,7 +296,7 @@ export default function WorkflowScreen() {
           </div>
 
           {/* Canvas Body (Nodes Flow) */}
-          <div className="flex-1 overflow-y-auto flex flex-col items-center pt-24 px-10 pb-10 pointer-events-auto">
+          <div className="flex-1 overflow-y-auto flex flex-col items-center pt-32 px-10 pb-10 pointer-events-auto relative">
             <div className="flex items-center w-full max-w-5xl justify-center relative mt-8 flex-wrap gap-y-16">
               {/* Connection Line Background */}
               <div className="absolute top-7 left-[5%] right-[5%] h-[2px] bg-border-dark -translate-y-1/2 z-0 hidden lg:block"></div>

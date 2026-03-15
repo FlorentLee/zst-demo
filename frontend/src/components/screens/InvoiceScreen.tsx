@@ -14,42 +14,7 @@ export interface InvoiceAnalyzeResponse {
   risk_warning?: string;
 }
 
-const initialMocks: InvoiceAnalyzeResponse[] = [
-  {
-    id: 'mock-1',
-    invoice_type: '增值税专用发票 · 北京联通科技',
-    amount: 84600.00,
-    invoice_number: '0123456789',
-    invoice_date: '2024-12-18',
-    compliance_score: 99.8,
-  },
-  {
-    id: 'mock-2',
-    invoice_type: '差旅费用报销单 · 张建国',
-    amount: 3280.00,
-    invoice_number: 'EXP-2024-2018',
-    invoice_date: '2024-12-17',
-    compliance_score: 85,
-    risk_warning: 'AI预警：餐饮费疑似超标，建议人工复核'
-  },
-  {
-    id: 'mock-3',
-    invoice_type: '增值税普通发票 · 上海云端科技',
-    amount: 128000.00,
-    invoice_number: '9876543210',
-    invoice_date: '2024-12-16',
-    compliance_score: 100,
-  },
-  {
-    id: 'mock-4',
-    invoice_type: '增值税专用发票 · 广州美林印刷',
-    amount: 42800.00,
-    invoice_number: '1122334455',
-    invoice_date: '2024-12-15',
-    compliance_score: 75,
-    risk_warning: '风险拦截：与账簿数据不符，差异 ¥12,400'
-  }
-];
+
 
 export default function InvoiceScreen() {
   const [analyzing, setAnalyzing] = useState(false);
@@ -66,20 +31,16 @@ export default function InvoiceScreen() {
 
   useEffect(() => {
     const items = ledgerItems;
-    if (items.length > 0) {
-      const mapped = items.map((item: any) => ({
-        id: item.id.toString(),
-        invoice_type: item.invoice_type || '未知类型',
-        invoice_number: item.invoice_number || '未知',
-        invoice_date: item.created_at ? new Date(item.created_at).toISOString().split('T')[0] : '未知',
-        amount: item.total_amount ?? item.amount ?? 0,
-        compliance_score: item.compliance_score ?? 0,
-        risk_warning: item.risk_warning,
-      }));
-      setResults(mapped);
-    } else {
-      setResults(initialMocks);
-    }
+    const mapped = items.map((item: any) => ({
+      id: item.id.toString(),
+      invoice_type: item.invoice_type || '未知类型',
+      invoice_number: item.invoice_number || '未知',
+      invoice_date: item.created_at ? new Date(item.created_at).toISOString().split('T')[0] : '未知',
+      amount: item.total_amount ?? item.amount ?? 0,
+      compliance_score: item.compliance_score ?? 0,
+      risk_warning: item.risk_warning,
+    }));
+    setResults(mapped);
   }, [ledgerItems]);
 
   const handleUpload = async (file: File) => {
@@ -128,12 +89,7 @@ export default function InvoiceScreen() {
   const handleSaveEdit = async () => {
     if (editingIndex !== null && editForm) {
       const targetId = editForm.id;
-      if (targetId && targetId.startsWith('mock-')) {
-        // Mock data: just update local state
-        const newResults = [...results];
-        newResults[editingIndex] = editForm;
-        setResults(newResults);
-      } else if (targetId) {
+      if (targetId) {
         // Real data: call API
         try {
           await updateLedgerItem(Number(targetId), {
@@ -157,12 +113,7 @@ export default function InvoiceScreen() {
     if (confirm('确认删除该记录吗？')) {
       const item = results[idx];
       const targetId = item.id;
-      if (targetId && targetId.startsWith('mock-')) {
-        // Mock data: just remove from local state
-        const newResults = [...results];
-        newResults.splice(idx, 1);
-        setResults(newResults);
-      } else if (targetId) {
+      if (targetId) {
         // Real data: call API
         try {
           await deleteLedgerItem(Number(targetId));

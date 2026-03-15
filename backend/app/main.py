@@ -5,6 +5,8 @@ import os
 from app.routers import invoice, ledger, analytics, workflow
 from app.core.database import Base, engine
 from app.services.rag_engine import init_rag_knowledge
+from app.core.seeder import seed_initial_data
+from app.core.database import SessionLocal
 
 # 创建SQLite数据库表
 Base.metadata.create_all(bind=engine)
@@ -36,8 +38,13 @@ app.include_router(workflow.router, prefix="/workflow", tags=["Workflow"])
 
 @app.on_event("startup")
 def startup_event():
-    """启动时初始化RAG知识库进 ChromaDB"""
+    """启动时初始化RAG知识库进 ChromaDB，并填充初始数据"""
     init_rag_knowledge()
+    db = SessionLocal()
+    try:
+        seed_initial_data(db)
+    finally:
+        db.close()
 
 @app.get("/")
 def read_root():
