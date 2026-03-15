@@ -21,6 +21,13 @@ class LedgerEntryCreate(BaseModel):
     total_amount: float
     invoice_type: str
 
+class LedgerEntryUpdate(BaseModel):
+    invoice_number: Optional[str] = None
+    total_amount: Optional[float] = None
+    invoice_type: Optional[str] = None
+    compliance_score: Optional[float] = None
+    risk_warning: Optional[str] = None
+
 class LedgerEntryResponse(LedgerEntryCreate):
     id: int
     created_at: Optional[datetime] = None

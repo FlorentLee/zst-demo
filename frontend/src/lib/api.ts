@@ -28,6 +28,12 @@ export const deleteLedgerItem = async (id: number) => {
   return data;
 };
 
+// 更新账簿记录 API
+export const updateLedgerItem = async (id: number, payload: Partial<{ invoice_number: string; invoice_type: string; total_amount: number; compliance_score: number; risk_warning: string; }>) => {
+  const { data } = await apiClient.put(`/ledger/${id}`, payload);
+  return data;
+};
+
 // 获取老板经营报告 API
 export const getCEOReport = async () => {
   const { data } = await apiClient.get('/analytics/mock-ceo-report');

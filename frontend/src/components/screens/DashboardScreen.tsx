@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { getLedger, deleteLedgerItem } from '@/lib/api';
+import { getLedger, deleteLedgerItem, updateLedgerItem } from '@/lib/api';
 
 export interface LedgerItem {
   id: number;
@@ -16,6 +16,11 @@ export interface LedgerItem {
 export default function DashboardScreen() {
   const [ledgerItems, setLedgerItems] = useState<LedgerItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Modal and Edit states
+  const [isViewAllOpen, setIsViewAllOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<LedgerItem | null>(null);
+  const [editForm, setEditForm] = useState<Partial<LedgerItem>>({});
 
   // Poll ledger data from backend
   const fetchLedger = async () => {
@@ -39,7 +44,6 @@ export default function DashboardScreen() {
   const handleDelete = async (id: number) => {
     try {
       await deleteLedgerItem(id);
-      // Re-fetch ledger immediately after deletion
       await fetchLedger();
     } catch (error) {
       console.error("Failed to delete ledger item:", error);
@@ -47,8 +51,33 @@ export default function DashboardScreen() {
     }
   };
 
+  const handleEditClick = (item: LedgerItem) => {
+    setEditingItem(item);
+    setEditForm({
+      invoice_number: item.invoice_number || '',
+      invoice_type: item.invoice_type || '',
+      total_amount: item.total_amount ?? item.amount ?? 0,
+      compliance_score: item.compliance_score ?? 0,
+    });
+  };
+
+  const handleUpdate = async () => {
+    if (!editingItem) return;
+    try {
+      await updateLedgerItem(editingItem.id, editForm);
+      setEditingItem(null);
+      await fetchLedger();
+    } catch (error) {
+      console.error("Failed to update ledger item:", error);
+      alert("更新失败，请稍后重试");
+    }
+  };
+
+  // Only show first 5 items on the dashboard
+  const displayItems = isViewAllOpen ? ledgerItems : ledgerItems.slice(0, 5);
+
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-4 md:p-6 relative">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-card border border-border-light shadow-sm rounded-xl p-5 relative overflow-hidden transition-all duration-200 hover:border-primary hover:shadow-md">
           <div className="absolute top-4 right-4 text-3xl opacity-20 filter grayscale">💰</div>
@@ -103,7 +132,6 @@ export default function DashboardScreen() {
             </div>
           </div>
           <div className="h-[200px] flex items-end gap-3 pb-6 relative px-2">
-            {/* Grid lines */}
             <div className="absolute top-0 left-0 right-0 h-px bg-border-light"></div>
             <div className="absolute top-[33%] left-0 right-0 h-px bg-border-light"></div>
             <div className="absolute top-[66%] left-0 right-0 h-px bg-border-light"></div>
@@ -118,11 +146,8 @@ export default function DashboardScreen() {
             ].map((col, idx) => (
               <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end cursor-pointer group relative z-10 hover:bg-bg-main/50 rounded-t-lg transition-colors">
                 <div className="flex items-end gap-[2px] sm:gap-[4px] w-full justify-center h-full pb-1">
-                  {/* Income Bar */}
                   <div className="w-[25%] max-w-[14px] bg-info rounded-t-[3px] opacity-80 group-hover:opacity-100 transition-all duration-300" style={{ height: col.inc }} title={`收入 (Income)`}></div>
-                  {/* Expense Bar */}
                   <div className="w-[25%] max-w-[14px] bg-warning rounded-t-[3px] opacity-80 group-hover:opacity-100 transition-all duration-300" style={{ height: col.exp }} title={`支出 (Expense)`}></div>
-                  {/* Profit Bar */}
                   <div className="w-[25%] max-w-[14px] bg-success rounded-t-[3px] opacity-85 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_8px_rgba(16,185,129,0.2)] group-hover:shadow-[0_0_12px_rgba(16,185,129,0.4)]" style={{ height: col.prof }} title={`净利润 (Profit)`}></div>
                 </div>
                 <div className="text-xs font-medium text-text-muted group-hover:text-primary transition-colors">{col.month}</div>
@@ -173,7 +198,22 @@ export default function DashboardScreen() {
       <div className="bg-card border border-border-light shadow-sm rounded-xl">
         <div className="p-5 border-b border-border-light flex items-center justify-between">
           <div className="text-sm font-bold text-text-main">最近处理记录</div>
-          <button className="text-xs text-primary font-medium hover:underline">查看全部</button>
+          {!isViewAllOpen && (
+            <button
+              onClick={() => setIsViewAllOpen(true)}
+              className="text-xs text-primary font-medium hover:underline"
+            >
+              查看全部
+            </button>
+          )}
+          {isViewAllOpen && (
+            <button
+              onClick={() => setIsViewAllOpen(false)}
+              className="text-xs text-text-muted font-medium hover:underline"
+            >
+              收起列表
+            </button>
+          )}
         </div>
 
         <div className="p-2 overflow-x-auto">
@@ -192,10 +232,10 @@ export default function DashboardScreen() {
             <tbody>
               {loading ? (
                 <tr><td colSpan={7} className="text-center py-8 text-text-muted text-sm">正在加载 SQLite 账簿...</td></tr>
-              ) : ledgerItems.length === 0 ? (
+              ) : displayItems.length === 0 ? (
                 <tr><td colSpan={7} className="text-center py-8 text-text-muted text-sm">暂无动态记录，请前往票据上传测试</td></tr>
               ) : (
-                ledgerItems.map((item) => (
+                displayItems.map((item) => (
                   <tr key={item.id} className="hover:bg-bg-main/50 transition-colors group">
                     <td className="py-3.5 px-4 text-xs font-mono text-text-main border-b border-border-light/50">{item.invoice_number || `SYS-${item.id}`}</td>
                     <td className="py-3.5 px-4 text-sm text-text-main border-b border-border-light/50">{item.invoice_type || '未知类型'}</td>
@@ -222,19 +262,27 @@ export default function DashboardScreen() {
                       )}
                     </td>
                     <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="text-xs text-danger hover:text-danger/80 hover:underline transition-colors"
-                      >
-                        删除
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => handleEditClick(item)}
+                          className="text-xs text-primary hover:text-primary/80 hover:underline transition-colors"
+                        >
+                          更改
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="text-xs text-danger hover:text-danger/80 hover:underline transition-colors"
+                        >
+                          移除
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
               )}
 
               {/* Fallback mock items to match UI if too few dynamic items are present */}
-              {ledgerItems.length < 3 && (
+              {ledgerItems.length < 3 && !isViewAllOpen && (
                 <>
                   <tr className="hover:bg-bg-main/50 transition-colors">
                     <td className="py-3.5 px-4 text-xs font-mono text-text-main border-b border-border-light/50">EXP-2024-2018</td>
@@ -268,6 +316,77 @@ export default function DashboardScreen() {
           </table>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {editingItem && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-card w-full max-w-md rounded-xl shadow-lg border border-border-light overflow-hidden">
+            <div className="p-4 border-b border-border-light flex justify-between items-center">
+              <h3 className="font-bold text-text-main">更改处理记录</h3>
+              <button
+                onClick={() => setEditingItem(null)}
+                className="text-text-muted hover:text-text-main"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4 flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-medium text-text-muted mb-1">票据编号</label>
+                <input
+                  type="text"
+                  value={editForm.invoice_number || ''}
+                  onChange={(e) => setEditForm({ ...editForm, invoice_number: e.target.value })}
+                  className="w-full bg-bg-main border border-border-light rounded px-3 py-2 text-sm focus:border-primary focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-text-muted mb-1">项目类型</label>
+                <input
+                  type="text"
+                  value={editForm.invoice_type || ''}
+                  onChange={(e) => setEditForm({ ...editForm, invoice_type: e.target.value })}
+                  className="w-full bg-bg-main border border-border-light rounded px-3 py-2 text-sm focus:border-primary focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-text-muted mb-1">金额</label>
+                <input
+                  type="number"
+                  value={editForm.total_amount || 0}
+                  onChange={(e) => setEditForm({ ...editForm, total_amount: Number(e.target.value) })}
+                  className="w-full bg-bg-main border border-border-light rounded px-3 py-2 text-sm focus:border-primary focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-text-muted mb-1">AI评分 (0-100)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={editForm.compliance_score || 0}
+                  onChange={(e) => setEditForm({ ...editForm, compliance_score: Number(e.target.value) })}
+                  className="w-full bg-bg-main border border-border-light rounded px-3 py-2 text-sm focus:border-primary focus:outline-none"
+                />
+              </div>
+            </div>
+            <div className="p-4 border-t border-border-light flex justify-end gap-3 bg-bg-main/50">
+              <button
+                onClick={() => setEditingItem(null)}
+                className="px-4 py-1.5 rounded text-sm font-medium text-text-main bg-white border border-border-light hover:bg-bg-main"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleUpdate}
+                className="px-4 py-1.5 rounded text-sm font-medium text-white bg-primary hover:bg-primary/90 shadow-sm"
+              >
+                保存更改
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
