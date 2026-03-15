@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 type FlowTemplate = 'expense' | 'contract' | 'invoice' | 'new';
 
 interface FlowNode {
+  id?: string;
   icon: string;
   title: string;
   desc: string;
@@ -22,21 +23,30 @@ interface FlowTemplateData {
   stats: { completed: number; pending: number; rejected: number; time: string };
 }
 
+const PALETTE_NODES: FlowNode[] = [
+  { icon: '🟢', title: '触发：提交申请', desc: '起点节点' },
+  { icon: '🤖', title: 'AI预审', desc: '智能审核', isAI: true },
+  { icon: '👤', title: '人工审核', desc: '人工干预' },
+  { icon: '📊', title: '条件分支', desc: '规则判断', isCondition: true },
+  { icon: '📧', title: '消息通知', desc: '发送提醒' },
+  { icon: '📒', title: '自动入账', desc: '执行动作' },
+  { icon: '🔴', title: '结束流程', desc: '终点节点' }
+];
+
 export default function WorkflowScreen() {
   const [activeTab, setActiveTab] = useState<FlowTemplate>('expense');
-
-  const templates: Record<FlowTemplate, FlowTemplateData> = {
+  const [templates, setTemplates] = useState<Record<FlowTemplate, FlowTemplateData>>({
     expense: {
       title: '费用报销审批流',
       id: 'WF-EXP-001',
       status: '运行中',
       nodes: [
-        { icon: '🟢', title: '员工提交', desc: '填写报销单' },
-        { icon: '🤖', title: 'AI预审', desc: '票据验真·合规检查', isAI: true },
-        { icon: '📊', title: '金额判断', desc: '≤5000元 / >5000元', isCondition: true },
-        { icon: '👤', title: '主管审批', desc: '部门负责人' },
-        { icon: '👤', title: '财务审核', desc: 'CFO · >5000元' },
-        { icon: '📒', title: '自动入账', desc: '生成凭证' },
+        { id: 'n1', icon: '🟢', title: '员工提交', desc: '填写报销单' },
+        { id: 'n2', icon: '🤖', title: 'AI预审', desc: '票据验真·合规检查', isAI: true },
+        { id: 'n3', icon: '📊', title: '金额判断', desc: '≤5000元 / >5000元', isCondition: true },
+        { id: 'n4', icon: '👤', title: '主管审批', desc: '部门负责人' },
+        { id: 'n5', icon: '👤', title: '财务审核', desc: 'CFO · >5000元' },
+        { id: 'n6', icon: '📒', title: '自动入账', desc: '生成凭证' },
       ],
       aiRules: [
         '发票真伪验证（国税API）',
@@ -53,12 +63,12 @@ export default function WorkflowScreen() {
       id: 'WF-CON-002',
       status: '运行中',
       nodes: [
-        { icon: '🟢', title: '业务提交', desc: '上传合同草案' },
-        { icon: '🤖', title: 'AI法务审核', desc: '条款风险/主客体校验', isAI: true },
-        { icon: '📊', title: '条件分支', desc: '常规/重大合同', isCondition: true },
-        { icon: '👤', title: '法务复核', desc: '重大合同' },
-        { icon: '👤', title: '业务总监', desc: '签批' },
-        { icon: '📒', title: '自动动作', desc: '归档&盖章' },
+        { id: 'c1', icon: '🟢', title: '业务提交', desc: '上传合同草案' },
+        { id: 'c2', icon: '🤖', title: 'AI法务审核', desc: '条款风险/主客体校验', isAI: true },
+        { id: 'c3', icon: '📊', title: '条件分支', desc: '常规/重大合同', isCondition: true },
+        { id: 'c4', icon: '👤', title: '法务复核', desc: '重大合同' },
+        { id: 'c5', icon: '👤', title: '业务总监', desc: '签批' },
+        { id: 'c6', icon: '📒', title: '自动动作', desc: '归档&盖章' },
       ],
       aiRules: [
         '合同主体工商信息核验',
@@ -74,11 +84,11 @@ export default function WorkflowScreen() {
       id: 'WF-INV-003',
       status: '运行中',
       nodes: [
-        { icon: '🟢', title: '供应商提交', desc: '上传发票' },
-        { icon: '🤖', title: 'AI预审', desc: '票面信息提取&验真', isAI: true },
-        { icon: '📊', title: '匹配订单', desc: '与采购订单比对', isCondition: true },
-        { icon: '👤', title: '采购确认', desc: '差异复核' },
-        { icon: '📒', title: '自动动作', desc: '进入付款池' },
+        { id: 'i1', icon: '🟢', title: '供应商提交', desc: '上传发票' },
+        { id: 'i2', icon: '🤖', title: 'AI预审', desc: '票面信息提取&验真', isAI: true },
+        { id: 'i3', icon: '📊', title: '匹配订单', desc: '与采购订单比对', isCondition: true },
+        { id: 'i4', icon: '👤', title: '采购确认', desc: '差异复核' },
+        { id: 'i5', icon: '📒', title: '自动动作', desc: '进入付款池' },
       ],
       aiRules: [
         '购买方/销售方信息校验',
@@ -94,12 +104,81 @@ export default function WorkflowScreen() {
       id: 'WF-NEW-000',
       status: '草稿',
       nodes: [
-        { icon: '🟢', title: '触发器', desc: '请选择触发条件' },
-        { icon: '➕', title: '添加节点', desc: '拖拽左侧节点到此', isAdd: true },
+        { id: 'new1', icon: '🟢', title: '触发器', desc: '请选择触发条件' },
+        { id: 'new2', icon: '➕', title: '添加节点', desc: '拖拽左侧节点到此', isAdd: true },
       ],
       aiRules: [],
       stats: { completed: 0, pending: 0, rejected: 0, time: '0.0' }
     }
+  });
+
+  const [draggedItem, setDraggedItem] = useState<{ type: 'palette' | 'node', index?: number, node: FlowNode } | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, type: 'palette' | 'node', node: FlowNode, index?: number) => {
+    setDraggedItem({ type, index, node });
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (!draggedItem) return;
+
+    const currentNodes = [...templates[activeTab].nodes];
+
+    // Create a new node instance with a unique ID
+    const newNode = { ...draggedItem.node, id: `node-${Date.now()}` };
+
+    if (draggedItem.type === 'palette') {
+      // Adding from palette
+      // Insert before the dropIndex (or replace the 'Add' placeholder if dropping on it)
+      if (currentNodes[dropIndex]?.isAdd) {
+        currentNodes.splice(dropIndex, 0, newNode);
+      } else {
+        currentNodes.splice(dropIndex, 0, newNode);
+      }
+    } else if (draggedItem.type === 'node' && draggedItem.index !== undefined) {
+      // Reordering existing nodes
+      const dragIndex = draggedItem.index;
+      if (dragIndex === dropIndex) return;
+
+      currentNodes.splice(dragIndex, 1);
+      // Adjust dropIndex if we removed an item before it
+      const actualDropIndex = dragIndex < dropIndex ? dropIndex - 1 : dropIndex;
+      currentNodes.splice(actualDropIndex, 0, draggedItem.node);
+    }
+
+    setTemplates(prev => ({
+      ...prev,
+      [activeTab]: {
+        ...prev[activeTab],
+        nodes: currentNodes
+      }
+    }));
+    setDraggedItem(null);
+  };
+
+  const removeNode = (index: number) => {
+    const currentNodes = [...templates[activeTab].nodes];
+    if (!currentNodes[index].isAdd) {
+      currentNodes.splice(index, 1);
+      setTemplates(prev => ({
+        ...prev,
+        [activeTab]: {
+          ...prev[activeTab],
+          nodes: currentNodes
+        }
+      }));
+    }
+  };
+
+  const saveChanges = () => {
+    alert(`工作流 [${templates[activeTab].title}] 保存成功！\n共包含 ${templates[activeTab].nodes.filter(n => !n.isAdd).length} 个节点。`);
+    // Here you would typically send `templates[activeTab]` to your backend API
   };
 
   const currentTemplate = templates[activeTab];
@@ -136,34 +215,17 @@ export default function WorkflowScreen() {
 
           <div className="p-4 flex-1 overflow-y-auto flex flex-col gap-3">
             {/* Node Items */}
-            <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-slate-400 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
-              <div className="text-xl">🟢</div>
-              <div className="text-sm font-medium">触发：提交申请</div>
-            </div>
-            <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-blue-500 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
-              <div className="text-xl">🤖</div>
-              <div className="text-sm font-medium">AI：自动审核</div>
-            </div>
-            <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-emerald-500 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
-              <div className="text-xl">👤</div>
-              <div className="text-sm font-medium">人工：主管审批</div>
-            </div>
-            <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-amber-500 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
-              <div className="text-xl">📊</div>
-              <div className="text-sm font-medium">条件：金额判断</div>
-            </div>
-            <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-purple-500 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
-              <div className="text-xl">📧</div>
-              <div className="text-sm font-medium">通知：发送消息</div>
-            </div>
-            <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-teal-500 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
-              <div className="text-xl">📒</div>
-              <div className="text-sm font-medium">动作：自动入账</div>
-            </div>
-            <div className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-red-500 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all">
-              <div className="text-xl">🔴</div>
-              <div className="text-sm font-medium">结束：完成/拒绝</div>
-            </div>
+            {PALETTE_NODES.map((node, index) => (
+              <div
+                key={index}
+                draggable
+                onDragStart={(e) => handleDragStart(e, 'palette', node)}
+                className="bg-white text-slate-700 p-3 rounded-lg border border-slate-200 hover:border-slate-400 hover:shadow-md hover:-translate-y-0.5 cursor-grab flex items-center gap-3 shadow-sm transition-all active:cursor-grabbing"
+              >
+                <div className="text-xl">{node.icon}</div>
+                <div className="text-sm font-medium">{node.title}</div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -186,7 +248,7 @@ export default function WorkflowScreen() {
             </div>
             <div className="flex gap-2 pointer-events-auto">
               <button className="btn btn-ghost !py-1.5 bg-white border border-border-light shadow-sm text-text-main hover:text-primary">历史版本</button>
-              <button className="btn btn-primary !py-1.5 shadow-sm">发布改动</button>
+              <button onClick={saveChanges} className="btn btn-primary !py-1.5 shadow-sm">发布改动</button>
             </div>
           </div>
 
@@ -198,19 +260,47 @@ export default function WorkflowScreen() {
               <div className="absolute top-7 left-[5%] right-[5%] h-[2px] bg-border-dark -translate-y-1/2 z-0 hidden lg:block"></div>
 
               {currentTemplate.nodes.map((node, index) => (
-                <React.Fragment key={index}>
-                  {/* Node */}
-                  <div className="relative z-10 flex flex-col items-center group cursor-pointer shrink-0 mx-2">
-                    {node.isAI ? (
-                      <div className="w-14 h-14 bg-primary/5 border-2 border-primary rounded-xl flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(37,99,235,0.2)] transition-transform group-hover:scale-110">
-                        {node.icon}
+                <React.Fragment key={node.id || index}>
+                  {/* Drop zone before node */}
+                  <div
+                    className="w-10 h-full min-h-[100px] flex items-center justify-center -mx-2 z-20 group/drop"
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, index)}
+                  >
+                    <div className="w-1 h-full bg-primary/0 group-hover/drop:bg-primary/50 transition-colors rounded-full flex items-center justify-center">
+                      <div className="w-6 h-6 rounded-full bg-primary text-white text-lg flex items-center justify-center opacity-0 group-hover/drop:opacity-100 scale-50 group-hover/drop:scale-100 transition-all shadow-md">
+                        +
                       </div>
-                    ) : node.isCondition ? (
+                    </div>
+                  </div>
+
+                  {/* Node */}
+                  <div
+                    className={`relative z-10 flex flex-col items-center group cursor-grab active:cursor-grabbing shrink-0 ${draggedItem?.node.id === node.id ? 'opacity-50' : ''}`}
+                    draggable={!node.isAdd}
+                    onDragStart={(e) => !node.isAdd && handleDragStart(e, 'node', node, index)}
+                  >
+                    {/* Delete Button */}
+                    {!node.isAdd && index !== 0 && (
+                      <button
+                        onClick={() => removeNode(index)}
+                        className="absolute -top-2 -right-2 w-5 h-5 bg-danger text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:scale-110 shadow-sm"
+                        title="删除节点"
+                      >
+                        ×
+                      </button>
+                    )}
+
+                    {node.isCondition ? (
                       <div className="w-14 h-14 bg-white border-2 border-warning rounded-xl rotate-45 flex items-center justify-center shadow-sm transition-transform group-hover:scale-110 group-hover:shadow-md">
                         <span className="-rotate-45 text-xl font-black text-warning">{node.icon}</span>
                       </div>
                     ) : node.isAdd ? (
-                      <div className="w-14 h-14 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center text-2xl text-slate-400 shadow-sm transition-transform hover:bg-slate-100 group-hover:scale-110">
+                      <div
+                        className="w-14 h-14 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center text-2xl text-slate-400 shadow-sm transition-all hover:bg-slate-100 hover:border-primary hover:text-primary"
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, index)}
+                      >
                         {node.icon}
                       </div>
                     ) : (
@@ -219,49 +309,64 @@ export default function WorkflowScreen() {
                       </div>
                     )}
 
-                    <div className={`${node.isCondition ? 'mt-5' : 'mt-3'} bg-white px-3 py-1 rounded shadow-sm text-sm font-bold whitespace-nowrap relative border ${node.isAI ? 'bg-primary text-white border-primary shadow-md' : 'border-border-light text-text-main bg-opacity-90'}`}>
+                    <div className={`${node.isCondition ? 'mt-5' : 'mt-3'} bg-white px-3 py-1 rounded shadow-sm text-sm font-bold whitespace-nowrap relative border border-border-light text-text-main bg-opacity-90`}>
                       {node.title}
-                      {/* Active Indicator Pulse for AI */}
-                      {node.isAI && (
-                        <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-300 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
-                        </span>
-                      )}
                     </div>
                     <div className="text-xs text-text-muted mt-1 max-w-[100px] text-center truncate">{node.desc}</div>
                   </div>
 
                   {/* Arrow (hide for last item) */}
                   {index < currentTemplate.nodes.length - 1 && (
-                    <div className="relative z-10 text-border-dark text-xl font-bold bg-white w-6 h-6 flex items-center justify-center rounded-full mx-2 mt-4 lg:mt-0 lg:self-start lg:translate-y-4">➔</div>
+                    <div className="relative z-10 text-border-dark text-xl font-bold bg-white w-6 h-6 flex items-center justify-center rounded-full mt-4 lg:mt-0 lg:self-start lg:translate-y-4 pointer-events-none">➔</div>
                   )}
                 </React.Fragment>
               ))}
+
+              {/* Drop zone after last node */}
+              <div
+                className="w-10 h-full min-h-[100px] flex items-center justify-center -mx-2 z-20 group/drop"
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, currentTemplate.nodes.length)}
+              >
+                <div className="w-1 h-full bg-primary/0 group-hover/drop:bg-primary/50 transition-colors rounded-full flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-full bg-primary text-white text-lg flex items-center justify-center opacity-0 group-hover/drop:opacity-100 scale-50 group-hover/drop:scale-100 transition-all shadow-md">
+                    +
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* AI Node Config Panel */}
             {currentTemplate.aiRules.length > 0 && (
-              <div className="mt-16 bg-blue-50/80 border border-primary/20 rounded-xl p-5 w-full max-w-[800px] shadow-sm relative overflow-hidden backdrop-blur-sm pointer-events-auto">
+              <div className="mt-16 bg-blue-50/80 border border-primary/20 rounded-xl p-5 w-full max-w-[800px] shadow-sm relative overflow-hidden backdrop-blur-sm pointer-events-auto flex flex-col max-h-[400px]">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10"></div>
 
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-4 shrink-0">
                   <span className="text-xl">⚙️</span>
                   <h3 className="text-sm font-bold text-primary">🤖 AI 节点配置 · 自动审核规则 (Agent Skills)</h3>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  {currentTemplate.aiRules.map((rule, idx) => (
-                    <div key={idx} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-primary/10 shadow-sm transition-colors hover:border-primary/30">
-                      <div className="w-6 h-6 rounded-full bg-success/20 text-success flex items-center justify-center text-sm shrink-0">✓</div>
-                      <div className="text-sm font-bold text-text-main truncate" title={rule}>{rule}</div>
+                <div className="overflow-y-auto pr-2 flex-1 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {currentTemplate.aiRules.map((rule, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-primary/10 shadow-sm transition-colors hover:border-primary/30 group">
+                        <div className="w-6 h-6 rounded-full bg-success/20 text-success flex items-center justify-center text-sm shrink-0">✓</div>
+                        <div className="text-sm font-bold text-text-main flex-1 whitespace-normal break-words" title={rule}>{rule}</div>
+                        <button className="text-text-muted hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity p-1" title="编辑规则">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                      </div>
+                    ))}
+                    <div className="flex items-center justify-center gap-2 p-3 bg-white/50 border border-dashed border-primary/30 rounded-lg text-primary/70 hover:bg-white hover:text-primary hover:border-primary/50 cursor-pointer transition-all">
+                      <span className="text-lg">+</span>
+                      <span className="text-sm font-bold">添加新规则</span>
                     </div>
-                  ))}
+                  </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-primary/10 flex justify-between items-center text-xs">
+                <div className="mt-4 pt-4 border-t border-primary/10 flex justify-between items-center text-xs shrink-0">
                   <span className="text-text-muted">当检测出异常或超过设定阈值时，自动触发后置的人工审核分支。</span>
-                  <button className="text-primary font-bold hover:underline">自定义编辑规则 →</button>
+                  <button className="text-primary font-bold hover:underline">管理所有规则 →</button>
                 </div>
               </div>
             )}
