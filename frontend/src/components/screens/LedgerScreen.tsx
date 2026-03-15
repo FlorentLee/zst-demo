@@ -4,10 +4,10 @@ import React from 'react';
 
 export default function LedgerScreen() {
   return (
-    <div className="p-6 max-w-[1200px] mx-auto">
-      <div className="flex gap-6 mb-6">
+    <div className="p-4 md:p-6 max-w-[1200px] mx-auto">
+      <div className="flex flex-col lg:flex-row gap-4 md:gap-6 mb-6">
         {/* Main Ledger Table */}
-        <div className="flex-1 bg-card border border-border-light rounded-xl p-6 shadow-sm flex flex-col">
+        <div className="flex-1 bg-card border border-border-light rounded-xl p-4 md:p-6 shadow-sm flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <div className="text-sm font-bold text-text-main flex items-center gap-2">
               <span className="w-1 h-4 bg-primary rounded-full"></span>
@@ -18,7 +18,7 @@ export default function LedgerScreen() {
             </span>
           </div>
           <div className="text-xs text-text-muted mb-5">🤖 系统已完成本月初始核算并生成凭证草稿，请确认无误后入账。</div>
-          
+
           <div className="overflow-x-auto">
             <table className="w-full text-left border-spacing-0">
               <thead>
@@ -88,7 +88,7 @@ export default function LedgerScreen() {
               </tbody>
             </table>
           </div>
-          
+
           <div className="mt-5 pt-4 border-t border-border-light flex gap-3 items-center">
             <button className="btn btn-primary font-medium shadow-sm">一键确认无误凭证</button>
             <button className="btn btn-ghost border border-border-light font-medium bg-white hover:bg-bg-main text-text-main">导出账套数据包</button>
@@ -97,7 +97,7 @@ export default function LedgerScreen() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         {/* Balance Sheet Stub */}
         <div className="bg-card border border-border-light rounded-xl p-6 shadow-sm flex flex-col hover:border-primary/30 transition-colors">
           <div className="text-sm font-bold text-text-main mb-4 flex items-center justify-between">
@@ -107,7 +107,7 @@ export default function LedgerScreen() {
             </div>
             <button className="text-xs text-primary hover:underline font-medium">查看财报</button>
           </div>
-          
+
           <div className="flex-1 flex flex-col gap-3">
             <div className="flex justify-between items-center py-2.5 border-b border-border-light border-dashed">
               <span className="text-xs text-text-muted flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-border-dark"></span> 流动资产</span>
@@ -136,7 +136,7 @@ export default function LedgerScreen() {
               关键指标：利润情况
             </div>
           </div>
-          
+
           <div className="flex-1 flex flex-col gap-3">
             <div className="flex justify-between items-center py-2.5 border-b border-border-light border-dashed">
               <span className="text-xs text-text-muted flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-success"></span> 营业收入 (本月)</span>
@@ -165,7 +165,7 @@ export default function LedgerScreen() {
               关键指标：现金流
             </div>
           </div>
-          
+
           <div className="flex-1 flex flex-col gap-3">
             <div className="flex justify-between items-center py-2.5 border-b border-border-light border-dashed">
               <span className="text-xs text-text-muted flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span> 经营活动流入</span>

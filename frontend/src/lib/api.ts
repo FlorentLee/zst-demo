@@ -22,6 +22,12 @@ export const getLedger = async () => {
   return data;
 };
 
+// 删除账簿记录 API
+export const deleteLedgerItem = async (id: number) => {
+  const { data } = await apiClient.delete(`/ledger/${id}`);
+  return data;
+};
+
 // 获取老板经营报告 API
 export const getCEOReport = async () => {
   const { data } = await apiClient.get('/analytics/mock-ceo-report');

@@ -124,7 +124,7 @@ export default function InvoiceScreen() {
       </div>
 
       {/* Results Grid */}
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Dynamic Items from Backend */}
         {results.map((r, idx) => {
           const hasRisk = r.risk_warning && r.risk_warning.length > 0;

@@ -9,21 +9,21 @@ export default function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
   const navItems = [
     { title: '核心功能' },
     { id: 'dashboard', icon: '📊', label: '工作台总览' },
-    { id: 'invoice', icon: '📄', label: 'AI票据识别', badge: '12', badgeColor: 'bg-primary text-white' },
+    { id: 'invoice', icon: '📄', label: 'AI票据识别' },
     { id: 'workflow', icon: '⚡', label: '审批工作流' },
     { id: 'ledger', icon: '📒', label: '智能记账' },
     { id: 'declare', icon: '📋', label: '税务申报', badge: '待申', badgeColor: 'bg-warning text-white' },
-    
+
     { title: '智能分析' },
     { id: 'risk', icon: '🛡️', label: '风险预警', badge: '3', badgeColor: 'bg-danger text-white' },
     { id: 'analytics', icon: '📈', label: '经营分析' },
-    
+
     { title: '系统管理' },
     { id: 'settings', icon: '⚙️', label: '系统设置' },
   ];
 
   return (
-    <aside className="w-sidebar bg-sidebar-bg flex flex-col shrink-0 relative z-20 shadow-lg">
+    <aside className="hidden md:flex w-sidebar bg-sidebar-bg flex-col shrink-0 relative z-20 shadow-lg">
       {/* Logo Area */}
       <div className="h-16 px-5 border-b border-white/10 flex items-center gap-3">
         <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-lg font-bold text-white shadow-sm">
@@ -47,20 +47,20 @@ export default function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
           }
 
           const isActive = currentScreen === item.id;
-          
+
           return (
             <div
               key={item.id}
               onClick={() => onNavigate(item.id)}
               className={`flex items-center gap-3 py-2.5 px-6 cursor-pointer text-sm font-medium transition-colors relative mx-2 rounded-md mb-1
-                ${isActive 
-                  ? 'bg-sidebar-active text-white shadow-md' 
+                ${isActive
+                  ? 'bg-sidebar-active text-white shadow-md'
                   : 'text-slate-300 hover:bg-sidebar-hover hover:text-white'
                 }`}
             >
               <span className="text-base w-5 text-center flex-shrink-0 opacity-90">{item.icon}</span>
               <span>{item.label}</span>
-              
+
               {item.badge && (
                 <span className={`ml-auto text-[10px] font-bold py-0.5 px-2 rounded-full min-w-[20px] text-center shadow-sm ${item.badgeColor}`}>
                   {item.badge}
@@ -77,8 +77,7 @@ export default function Sidebar({ currentScreen, onNavigate }: SidebarProps) {
           张总
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-white truncate">张建国</div>
-          <div className="text-[11px] text-slate-400 truncate mt-0.5">超级管理员</div>
+          <div className="text-sm font-medium text-white truncate">超级管理员</div>
         </div>
         <div className="text-slate-500">⋮</div>
       </div>

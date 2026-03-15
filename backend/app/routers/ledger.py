@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from app.core.database import get_db
@@ -14,3 +14,15 @@ def get_ledger_entries(db: Session = Depends(get_db)):
     """
     items = db.query(LedgerItem).order_by(LedgerItem.id.desc()).all()
     return items
+
+@router.delete("/{item_id}")
+def delete_ledger_entry(item_id: int, db: Session = Depends(get_db)):
+    """
+    删除账簿记录
+    """
+    item = db.query(LedgerItem).filter(LedgerItem.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    db.delete(item)
+    db.commit()
+    return {"message": "Deleted successfully", "id": item_id}

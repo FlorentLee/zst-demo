@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { getLedger } from '@/lib/api';
+import { getLedger, deleteLedgerItem } from '@/lib/api';
 
 export interface LedgerItem {
   id: number;
@@ -18,27 +18,38 @@ export default function DashboardScreen() {
   const [loading, setLoading] = useState(true);
 
   // Poll ledger data from backend
-  useEffect(() => {
-    const fetchLedger = async () => {
-      try {
-        const response = await getLedger();
-        console.log("=== DEBUG: Dashboard Ledger Data ===", response);
-        setLedgerItems(response.items || response || []);
-      } catch (error) {
-        console.error("Failed to fetch ledger:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchLedger = async () => {
+    try {
+      const response = await getLedger();
+      console.log("=== DEBUG: Dashboard Ledger Data ===", response);
+      setLedgerItems(response.items || response || []);
+    } catch (error) {
+      console.error("Failed to fetch ledger:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchLedger();
     const interval = setInterval(fetchLedger, 5000);
     return () => clearInterval(interval);
   }, []);
 
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteLedgerItem(id);
+      // Re-fetch ledger immediately after deletion
+      await fetchLedger();
+    } catch (error) {
+      console.error("Failed to delete ledger item:", error);
+      alert("删除失败，请稍后重试");
+    }
+  };
+
   return (
-    <div className="p-6">
-      <div className="grid grid-cols-4 gap-4 mb-6">
+    <div className="p-4 md:p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-card border border-border-light shadow-sm rounded-xl p-5 relative overflow-hidden transition-all duration-200 hover:border-primary hover:shadow-md">
           <div className="absolute top-4 right-4 text-3xl opacity-20 filter grayscale">💰</div>
           <div className="text-xs text-text-muted font-medium mb-1.5 uppercase tracking-wide">本月处理票据金额</div>
@@ -80,7 +91,7 @@ export default function DashboardScreen() {
         </div>
       </div>
 
-      <div className="grid grid-cols-[2fr_1fr] gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 md:gap-6 mb-6">
         {/* Revenue Chart */}
         <div className="bg-card border border-border-light shadow-sm rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
@@ -165,23 +176,24 @@ export default function DashboardScreen() {
           <button className="text-xs text-primary font-medium hover:underline">查看全部</button>
         </div>
 
-        <div className="p-2">
-          <table className="w-full text-left border-spacing-0">
+        <div className="p-2 overflow-x-auto">
+          <table className="w-full text-left border-spacing-0 min-w-[800px]">
             <thead>
               <tr>
                 <th className="text-xs text-text-muted font-medium py-3 px-4 border-b border-border-light bg-bg-main/50 rounded-tl-lg">票据编号</th>
                 <th className="text-xs text-text-muted font-medium py-3 px-4 border-b border-border-light bg-bg-main/50">项目类型</th>
                 <th className="text-xs text-text-muted font-medium py-3 px-4 border-b border-border-light bg-bg-main/50">金额</th>
                 <th className="text-xs text-text-muted font-medium py-3 px-4 border-b border-border-light bg-bg-main/50">创建时间</th>
-                <th className="text-xs text-text-muted font-medium py-3 px-4 border-b border-border-light bg-bg-main/50">AI识别</th>
-                <th className="text-xs text-text-muted font-medium py-3 px-4 border-b border-border-light bg-bg-main/50 rounded-tr-lg">状态</th>
+                <th className="text-xs text-text-muted font-medium py-3 px-4 border-b border-border-light bg-bg-main/50">AI评分</th>
+                <th className="text-xs text-text-muted font-medium py-3 px-4 border-b border-border-light bg-bg-main/50">状态</th>
+                <th className="text-xs text-text-muted font-medium py-3 px-4 border-b border-border-light bg-bg-main/50 rounded-tr-lg">操作</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="text-center py-8 text-text-muted text-sm">正在加载 SQLite 账簿...</td></tr>
+                <tr><td colSpan={7} className="text-center py-8 text-text-muted text-sm">正在加载 SQLite 账簿...</td></tr>
               ) : ledgerItems.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-8 text-text-muted text-sm">暂无动态记录，请前往票据上传测试</td></tr>
+                <tr><td colSpan={7} className="text-center py-8 text-text-muted text-sm">暂无动态记录，请前往票据上传测试</td></tr>
               ) : (
                 ledgerItems.map((item) => (
                   <tr key={item.id} className="hover:bg-bg-main/50 transition-colors group">
@@ -191,15 +203,31 @@ export default function DashboardScreen() {
                     <td className="py-3.5 px-4 text-xs text-text-muted border-b border-border-light/50">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '-'}</td>
                     <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
                       {(item.compliance_score ?? 0) >= 90 ? (
-                        <span className="text-success font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-success"></span> {item.compliance_score}%</span>
+                        <span className="text-success font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-success"></span> {item.compliance_score}分</span>
+                      ) : (item.compliance_score ?? 0) >= 60 ? (
+                        <span className="text-warning font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-warning"></span> {item.compliance_score}分</span>
                       ) : (item.compliance_score ?? 0) > 0 ? (
-                        <span className="text-warning font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-warning"></span> {item.compliance_score}%</span>
+                        <span className="text-danger font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-danger"></span> {item.compliance_score}分</span>
                       ) : (
                         <span className="text-text-muted text-xs">-</span>
                       )}
                     </td>
                     <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
-                      <span className="inline-block py-1 px-2.5 rounded text-xs font-semibold bg-success/10 text-success border border-success/20">已入账</span>
+                      {(item.compliance_score ?? 0) >= 90 ? (
+                        <span className="inline-block py-1 px-2.5 rounded text-xs font-semibold bg-success/10 text-success border border-success/20">已入账</span>
+                      ) : (item.compliance_score ?? 0) >= 60 ? (
+                        <span className="inline-block py-1 px-2.5 rounded text-xs font-semibold bg-warning/10 text-warning border border-warning/20">AI预警</span>
+                      ) : (
+                        <span className="inline-block py-1 px-2.5 rounded text-xs font-semibold bg-danger/10 text-danger border border-danger/20">人工核验</span>
+                      )}
+                    </td>
+                    <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="text-xs text-danger hover:text-danger/80 hover:underline transition-colors"
+                      >
+                        删除
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -214,11 +242,12 @@ export default function DashboardScreen() {
                     <td className="py-3.5 px-4 text-sm text-text-main font-semibold border-b border-border-light/50">¥ 3,280</td>
                     <td className="py-3.5 px-4 text-xs text-text-muted border-b border-border-light/50">2024-12-17</td>
                     <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
-                      <span className="text-warning font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-warning"></span> 待核查</span>
+                      <span className="text-warning font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-warning"></span> 75分</span>
                     </td>
                     <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
-                      <span className="inline-block py-1 px-2.5 rounded text-xs font-semibold bg-warning/10 text-warning border border-warning/20">审批中</span>
+                      <span className="inline-block py-1 px-2.5 rounded text-xs font-semibold bg-warning/10 text-warning border border-warning/20">AI预警</span>
                     </td>
+                    <td className="py-3.5 px-4 text-sm border-b border-border-light/50">-</td>
                   </tr>
                   <tr className="hover:bg-bg-main/50 transition-colors">
                     <td className="py-3.5 px-4 text-xs font-mono text-text-main border-b border-border-light/50">INV-2024-4819</td>
@@ -226,11 +255,12 @@ export default function DashboardScreen() {
                     <td className="py-3.5 px-4 text-sm text-text-main font-semibold border-b border-border-light/50">¥ 42,800</td>
                     <td className="py-3.5 px-4 text-xs text-text-muted border-b border-border-light/50">2024-12-15</td>
                     <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
-                      <span className="text-danger font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-danger"></span> 数据异常</span>
+                      <span className="text-danger font-medium text-xs flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-danger"></span> 20分</span>
                     </td>
                     <td className="py-3.5 px-4 text-sm border-b border-border-light/50">
-                      <span className="inline-block py-1 px-2.5 rounded text-xs font-semibold bg-danger/10 text-danger border border-danger/20">需处理</span>
+                      <span className="inline-block py-1 px-2.5 rounded text-xs font-semibold bg-danger/10 text-danger border border-danger/20">人工核验</span>
                     </td>
+                    <td className="py-3.5 px-4 text-sm border-b border-border-light/50">-</td>
                   </tr>
                 </>
               )}

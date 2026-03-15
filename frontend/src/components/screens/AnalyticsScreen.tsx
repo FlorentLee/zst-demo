@@ -49,8 +49,8 @@ export default function AnalyticsScreen() {
   }, []);
 
   return (
-    <div className="p-6 max-w-[1200px] mx-auto">
-      <div className="grid grid-cols-[1.5fr_1fr] gap-6 mb-6">
+    <div className="p-4 md:p-6 max-w-[1200px] mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-4 md:gap-6 mb-6">
         {/* Income Structure */}
         <div className="bg-card border border-border-light rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-5">
@@ -111,10 +111,10 @@ export default function AnalyticsScreen() {
             <div className="absolute top-[30%] left-0 right-0 h-px bg-border-light border-dashed"></div>
 
             {[
-              { m: 'Q1', r: 96.4, h: '96%', c: 'bg-primary' },
-              { m: 'Q2', r: 94.9, h: '95%', c: 'bg-info' },
-              { m: 'Q3', r: 95.1, h: '95%', c: 'bg-purple-400' },
-              { m: 'Q4 (预计)', r: 98.8, h: '99%', c: 'bg-success shadow-[0_0_12px_rgba(16,185,129,0.3)] border border-success' }
+              { m: 'Q1', r: 82.5, h: '82%', c: 'bg-primary' },
+              { m: 'Q2', r: 86.8, h: '87%', c: 'bg-info' },
+              { m: 'Q3', r: 91.4, h: '91%', c: 'bg-purple-400' },
+              { m: 'Q4', r: 94.7, h: '95%', c: 'bg-success shadow-[0_0_12px_rgba(16,185,129,0.3)] border border-success' }
             ].map((bar, i) => (
               <div key={i} className="flex flex-col justify-end items-center gap-2 w-12 h-full group cursor-pointer relative z-10">
                 <div className="text-[10px] font-bold text-text-muted group-hover:text-text-main transition-colors">{bar.r}%</div>

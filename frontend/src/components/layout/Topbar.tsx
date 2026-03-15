@@ -20,13 +20,9 @@ export default function Topbar({ title, subtitle, onRefresh }: TopbarProps) {
           </span>
         )}
       </div>
-      
+
       {/* Actions */}
       <div className="flex items-center gap-3">
-        <button className="btn btn-ghost !py-1.5 !px-3 !text-xs" onClick={onRefresh}>
-          ⟳ 刷新
-        </button>
-        
         <div className="relative group">
           <button className="btn btn-ghost !py-1.5 !px-3 !text-xs flex items-center gap-1">
             ⬇ 导出报表 <span className="text-[10px]">▼</span>
