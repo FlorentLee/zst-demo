@@ -15,6 +15,8 @@ export interface InvoiceAnalyzeResponse {
 export default function InvoiceScreen() {
   const [analyzing, setAnalyzing] = useState(false);
   const [results, setResults] = useState<InvoiceAnalyzeResponse[]>([]);
+  const [progress, setProgress] = useState(0);
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load from localStorage on mount
@@ -38,6 +40,16 @@ export default function InvoiceScreen() {
 
   const handleUpload = async (file: File) => {
     setAnalyzing(true);
+    setStatusMessage(null);
+    setProgress(0);
+
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 95) return 95;
+        return prev + Math.random() * 15;
+      });
+    }, 500);
+
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -51,10 +63,12 @@ export default function InvoiceScreen() {
         setResults(prev => [parsed, ...prev]);
       }
 
-      alert("✅ AI解析并入账完毕! 可以在工作台下方和 SQLite中 看到。");
+      setProgress(100);
+      setStatusMessage({ type: 'success', text: 'AI解析并入账完毕! 已录入工作台下方的最近处理记录。' });
     } catch (e) {
-      alert("解析失败，请检查服务日志。");
+      setStatusMessage({ type: 'error', text: '解析失败，请检查服务日志。' });
     } finally {
+      clearInterval(interval);
       setAnalyzing(false);
     }
   };
@@ -87,14 +101,6 @@ export default function InvoiceScreen() {
           </div>
           <div className="text-base font-bold text-text-main mb-2">点击或拖拽上传票据文件</div>
           <div className="text-xs text-text-muted">支持增值税发票、收据、费用单等。支持 PDF, JPG/PNG 格式，单文件不超过 10MB</div>
-          <div className="mt-5 flex gap-3 justify-center">
-            <button className="btn btn-primary shadow-sm" onClick={(e) => { e.stopPropagation(); onZoneClick(); }}>
-              <span className="mr-1">🤖</span> 智能解析并入账
-            </button>
-            <button className="btn btn-ghost border border-border-light bg-white hover:bg-bg-main" onClick={(e) => { e.stopPropagation(); onZoneClick(); }}>
-              <span className="mr-1">📷</span> 手机扫码上传
-            </button>
-          </div>
         </div>
       </div>
 
@@ -103,11 +109,22 @@ export default function InvoiceScreen() {
         <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6 flex flex-col gap-3 shadow-sm">
           <div className="flex items-center gap-2">
             <span className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></span>
-            <span className="text-primary font-bold text-sm">Gemini多模态视觉校验与RAG合规审计中...</span>
+            <span className="text-primary font-bold text-sm">Gemini大模型校验和RAG合规审计中...</span>
           </div>
           <div className="h-1.5 bg-bg-main rounded-full overflow-hidden w-full relative">
-            <div className="absolute top-0 bottom-0 left-0 w-2/3 bg-primary rounded-full animate-pulse shadow-[0_0_8px_rgba(37,99,235,0.6)]"></div>
+            <div
+              className="absolute top-0 bottom-0 left-0 bg-primary rounded-full transition-all duration-300 shadow-[0_0_8px_rgba(37,99,235,0.6)]"
+              style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+            ></div>
           </div>
+        </div>
+      )}
+
+      {/* Status Message */}
+      {statusMessage && !analyzing && (
+        <div className={`border rounded-lg p-4 mb-6 flex items-center gap-2 shadow-sm ${statusMessage.type === 'success' ? 'bg-success/5 border-success/20 text-success' : 'bg-danger/5 border-danger/20 text-danger'}`}>
+          <span>{statusMessage.type === 'success' ? '✅' : '❌'}</span>
+          <span className="font-bold text-sm">{statusMessage.text}</span>
         </div>
       )}
 
